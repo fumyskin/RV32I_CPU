@@ -60,10 +60,7 @@ begin
         v_rs1_addr := curr_instruction(19 downto 15);
         v_rs2_addr := curr_instruction(24 downto 20);
         
-        v_usage_alu := '1';                                         -- set default values (overwritten in some case)
-        v_usage_writeback := '1';
-        v_usage_mem := '0';
-        v_OP_SIGN := OP_SIGNED;
+        v_OP_SIGN := OP_SIGNED;                                     -- set default value (overwritten in some case)
 
         case(curr_instruction(6 downto 0)) is                       -- instruction class definition
             when "0110011" =>
