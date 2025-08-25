@@ -19,8 +19,6 @@ entity InstructionDecoder is
         -- 01: value from alu result,       (ALU_OP result needed, skip register file)
         -- 10: value from memory result,    (OP_LOAD result needed, skip register file)
         
-        
-        
         rs1_addr: out std_logic_vector(4 downto 0);
         rs1_value: out std_logic_vector(31 downto 0);
         rs2_addr: out std_logic_vector(4 downto 0);
@@ -269,6 +267,7 @@ begin
                         v_BRANCH_OP_COND := OP_BRANCH_GE;
                         v_OP_SIGN:= OP_UNSIGNED;
                 end case;
+                    
             when "1101111" | "1100111" => -- JAL (class J) | JALR (class I)
                 v_pc_changer := '1';
                 v_usage_jump := '1';
@@ -287,6 +286,7 @@ begin
         case(v_instruction_class) is                                -- immediate mapping
             when R =>
                 null;                                               -- immediate not present in R instructions
+            
             when I =>
                 case(v_OP_SIGN) is
                     when OP_SIGNED =>
@@ -294,6 +294,7 @@ begin
                     when OP_UNSIGNED =>
                         v_immediate := std_logic_vector(resize(curr_instruction(31 downto 20)), 32);
                 end case;
+                    
             when S =>
                 case(v_OP_SIGN) is
                     when OP_SIGNED =>
@@ -307,6 +308,7 @@ begin
                             curr_instruction(11 downto 7)
                         ), 32);
                 end case;
+                    
             when B =>
                 v_immediate := std_logic_vector(resize(
                     curr_instruction(31) &             -- imm[12]
@@ -315,11 +317,13 @@ begin
                     curr_instruction(11 downto 8) &    -- imm[4:1]
                     '0'                                -- imm[0]
                 ), 32);
+
             when U =>
                 v_immediate := std_logic_vector(resize(
                     curr_instruction(31 downto 12) &   -- imm[31:12]
                     x"000"                             -- imm[11:0]
                 ), 32);
+
             when J =>
                 v_immediate := std_logic_vector(resize(signed(
                     curr_instruction(31) &             -- imm[20]
@@ -328,6 +332,7 @@ begin
                     curr_instruction(30 downto 21) &   -- imm[10:1]
                     '0'                                -- imm[0]
                 ), 32));
+
             when ERR =>
                 v_immediate := (others => '0');
                 v_usage_alu := '0';
@@ -342,16 +347,20 @@ begin
                 regfile_rs1_addr <= v_rs1_addr;
                 regfile_rs2_addr <= v_rs2_addr;
                 regfile_read_enable <= '1';
+
             when  I =>
                 regfile_rs1_addr <= v_rs1_addr;
                 regfile_rs2_addr <= "00000";                        -- prevent unwanted readings
                 regfile_read_enable <= '1';
+
             when U | J =>
                 regfile_read_enable <= '0';
+
             when ERR =>
                 regfile_rs1_addr <= "00000";
                 regfile_rs2_addr <= "00000";
                 regfile_read_enable <= '0';
+
         end case;
 
         s_instruction_class <= v_instruction_class;                 -- variables to signals mapping
@@ -387,13 +396,7 @@ begin
 
     end process;
 
-    rs1_addr <= s_rs1_addr;                                         -- output signals mapping
-    rs1_value <= s_rs1_value;
-    rs2_addr <= s_rs2_addr;
-    rs2_value <= s_rs2_value;
-    rd_addr <= s_rd_addr;
-    immediate <= s_immediate;
-    instruction_class <= s_instruction_class;
+    instruction_class <= s_instruction_class;                        -- output signals mapping
     ALU_OP <= s_ALU_OP;
     MEM_OP <= s_MEM_OP;
     MEM_OP_SIZE <= s_MEM_OP_SIZE;
@@ -404,6 +407,12 @@ begin
     usage_mem <= s_usage_mem;
     usage_writeback <= s_usage_writeback;
     pipe_pc_changer <= s_pc_changer;
+    rs1_addr <= s_rs1_addr;
+    rs1_value <= s_rs1_value;
+    rs2_addr <= s_rs2_addr;
+    rs2_value <= s_rs2_value;
+    rd_addr <= s_rd_addr;
+    immediate <= s_immediate;
 
     reg_pc <= curr_pc;
 end behaviour ;
