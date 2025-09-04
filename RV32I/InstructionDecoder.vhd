@@ -7,14 +7,15 @@ entity InstructionDecoder is
     port(
         clock: in std_logic;                                        -- mapped directly to the register file (memory)
         curr_instruction: in std_logic_vector(31 downto 0);
-        curr_pc: in std_logic_vector(10 downto 0);
+        next_pc: in std_logic_vector(31 downto 0);
 
         pipe_writeback_enable: in std_logic;                        -- register file, write access from next stages result
         pipe_writeback_addr: in std_logic_vector(4 downto 0);
         pipe_writeback_value: in std_logic_vector(31 downto 0);
         pipe_res_alu: in std_logic_vector(31 downto 0);             -- input needed for hazards in the pipeline 
         pipe_res_mem: in std_logic_vector(31 downto 0);
-        pipe_res_selection: in std_logic(1 downto 0);
+        pipe_res_rs1_selection: in std_logic(1 downto 0);
+        pipe_res_rs2_selection: in std_logic(1 downto 0);
         -- 00: value from register file,    (use value read from register file)
         -- 01: value from alu result,       (ALU_OP result needed, skip register file)
         -- 10: value from memory result,    (OP_LOAD result needed, skip register file)
@@ -39,7 +40,7 @@ entity InstructionDecoder is
         usage_writeback: out std_logic;
         pipe_pc_changer: out std_logic;                             -- flag to signal the pipe controller that the instruction could change PC (branches and jumps)
 
-        reg_pc: out std_logic_vector(10 downto 0)
+        reg_pc: out std_logic_vector(31 downto 0)
     );
 end entity InstructionDecoder;
 architecture behaviour of InstructionDecoder is
@@ -111,7 +112,7 @@ begin
         variable v_usage_mem: std_logic;
         variable v_usage_writeback: std_logic;
     begin
-        -- it needs to do:
+        -- it needs to:
         --      recognize the instruction class [DONE]
         --      assign the new aluop type [DONE]
         --      set stages usage (mem_access, alu_usage, write_back) [DONE]
@@ -344,14 +345,18 @@ begin
         
         case(v_instruction_class) is                                -- asynchronous/immediate registers fetch
             when R | S | B =>
-                regfile_rs1_addr <= v_rs1_addr;
-                regfile_rs2_addr <= v_rs2_addr;
-                regfile_read_enable <= '1';
+                if pipe_res_rs1_selection & pipe_res_rs2_selection = "0000" then
+                    regfile_rs1_addr <= v_rs1_addr;
+                    regfile_rs2_addr <= v_rs2_addr;
+                    regfile_read_enable <= '1';
+                end if;
 
             when  I =>
-                regfile_rs1_addr <= v_rs1_addr;
                 regfile_rs2_addr <= "00000";                        -- prevent unwanted readings
-                regfile_read_enable <= '1';
+                if pipe_res_rs1_selection = "00" then
+                    regfile_rs1_addr <= v_rs1_addr;
+                    regfile_read_enable <= '1';
+                end if;
 
             when U | J =>
                 regfile_read_enable <= '0';
@@ -360,7 +365,20 @@ begin
                 regfile_rs1_addr <= "00000";
                 regfile_rs2_addr <= "00000";
                 regfile_read_enable <= '0';
-
+        end case;
+        case(pipe_res_rs1_selection) is
+            when "01" =>
+                v_rs1_value := reg_pipe_res_alu;
+            when "10" =>
+                v_rs1_value := reg_pipe_res_mem;
+            when others => null;
+        end case;
+        case(pipe_res_rs2_selection) is
+            when "01" =>
+                v_rs2_value := reg_pipe_res_alu;
+            when "10" =>
+                v_rs2_value := reg_pipe_res_mem;
+            when others => null;
         end case;
 
         s_instruction_class <= v_instruction_class;                 -- variables to signals mapping
@@ -414,5 +432,5 @@ begin
     rd_addr <= s_rd_addr;
     immediate <= s_immediate;
 
-    reg_pc <= curr_pc;
+    reg_pc <= next_pc;
 end behaviour ;
