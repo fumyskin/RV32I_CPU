@@ -6,15 +6,15 @@ entity InstructionFetcher is
 port (
     clock: in std_logic;
     reset: in std_logic;
-    curr_pc: in std_logic_vector(10 downto 0);
+    curr_pc: in std_logic_vector(31 downto 0);
     enable_next_pc: in std_logic;
     curr_instruction: out std_logic_vector(31 downto 0);
-    reg_pc: out std_logic_vector(10 downto 0)
+    reg_pc: out std_logic_vector(31 downto 0)
 );
 end entity InstructionFetcher;
 
 architecture Behavioral of InstructionFetcher is
-    signal s_curr_pc: std_logic_vector(10 downto 0);
+    signal s_curr_pc: std_logic_vector(31 downto 0);
 begin
     BRAMInstance : InstructionMemory
     port map(
@@ -32,5 +32,5 @@ begin
             s_curr_pc <= (others => '0');
         end if;
     end process;
-    reg_pc <= s_curr_pc;
+    reg_pc <=  std_logic_vector(unsigned(s_curr_pc) + 4);
 end Behavioral;
