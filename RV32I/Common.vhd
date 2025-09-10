@@ -4,7 +4,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 package common is
     type INST_CLASS_T is(
-        R, I, S, B, U, J, ERR
+        R, I, S, B, U, J, NOP, ERR
     );
     type ALU_OP_T is(
         OP_ADD,
@@ -19,6 +19,8 @@ package common is
         OP_SLTU,
         OP_LUI,
         OP_AUIPC,
+        OP_JAL,
+        OP_JALR,
         OP_NOP,
         OP_ERR
     );
