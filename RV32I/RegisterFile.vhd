@@ -6,6 +6,7 @@ use work.common.ALL;
 entity RegisterFile is
     port(
         clock: in std_logic;
+        reset: in std_logic;
         
         addr_A: in std_logic_vector(4 downto 0);
         addr_B: in std_logic_vector(4 downto 0);
@@ -27,7 +28,9 @@ architecture behaviour of RegisterFile is
     begin
         process(clock)                                              -- only write operations are synchronous
         begin
-            if rising_edge(clock) then
+            if reset = '1' then
+                reg_memory <= (others => (others => '0'))
+            elsif rising_edge(clock) then
                 if write_enable = '1' then
                     if addr_C /= "00000" then                       -- don't write on x0
                         reg_memory(addr_C) <= write_C;

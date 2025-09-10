@@ -6,6 +6,8 @@ use work.common.ALL;
 entity InstructionDecoder is
     port(
         clock: in std_logic;                                        -- mapped directly to the register file (memory)
+        reset: in std_logic;
+
         curr_instruction: in std_logic_vector(31 downto 0);
         next_pc: in std_logic_vector(31 downto 0);
 
@@ -39,7 +41,6 @@ entity InstructionDecoder is
         usage_mem: out std_logic;
         usage_writeback: out std_logic;
         pipe_pc_changer: out std_logic;                             -- flag to signal the pipe controller that the instruction could change PC (branches and jumps)
-
         reg_pc: out std_logic_vector(31 downto 0)
     );
 end entity InstructionDecoder;
@@ -87,8 +88,7 @@ begin
         val_B => regfile_rs2_value
     );
 
-
-    decodeInstruction:process(curr_instruction)
+    decodeInstruction:process(curr_instruction, pipe_writeback_enable, pipe_writeback_addr, pipe_writeback_value, pipe_res_alu, pipe_res_mem, pipe_res_rs1_selection, pipe_res_rs2_selection)
         variable v_funct3: std_logic_vector(2 downto 0);
         variable v_funct7: std_logic_vector(6 downto 0);
         variable v_rd_addr: std_logic_vector(4 downto 0);
@@ -275,6 +275,13 @@ begin
                 v_usage_alu := '0';
                 v_usage_mem := '0';
                 v_usage_writeback := '1';  
+                if v_instruction_class = J then
+                    v_ALU_OP:= OP_JAL;
+                elsif v_instruction_class = I then
+                    v_ALU_OP:= OP_JALR;
+                else
+                    v_ALU_OP:= OP_ERR;
+                end if;
 
         -- when "1110011" =>                                        -- I class but for OS/debug (not yet implemented)
         --     case(v_funct3) is
@@ -414,23 +421,47 @@ begin
 
     end process;
 
-    instruction_class <= s_instruction_class;                        -- output signals mapping
-    ALU_OP <= s_ALU_OP;
-    MEM_OP <= s_MEM_OP;
-    MEM_OP_SIZE <= s_MEM_OP_SIZE;
-    OP_SIGN <= s_OP_SIGN;
-    BRANCH_OP_COND <= s_BRANCH_OP_COND;
-    usage_jump <= s_usage_jump;
-    usage_alu <= s_usage_alu;
-    usage_mem <= s_usage_mem;
-    usage_writeback <= s_usage_writeback;
-    pipe_pc_changer <= s_pc_changer;
-    rs1_addr <= s_rs1_addr;
-    rs1_value <= s_rs1_value;
-    rs2_addr <= s_rs2_addr;
-    rs2_value <= s_rs2_value;
-    rd_addr <= s_rd_addr;
-    immediate <= s_immediate;
-
-    reg_pc <= next_pc;
+    pipelineRegisters: process(clock, reset)
+    begin
+        if reset = '1' then
+            rs1_addr <= (others => '0');
+            rs1_value <= (others => '0');
+            rs2_addr <= (others => '0');
+            rs2_value <= (others => '0');
+            rd_addr <= (others => '0');
+            immediate <= (others => '0');
+            instruction_class <= NOP;
+            ALU_OP <= OP_NOP;
+            MEM_OP <= OP_LOAD;
+            MEM_OP_SIZE <= OP_SIZE_WORD;
+            OP_SIGN <= OP_UNSIGNED;
+            BRANCH_OP_COND <= OP_BRANCH_EQ;
+            usage_jump <= '0';
+            usage_alu <= '0';
+            usage_mem <= '0';
+            usage_writeback <= '0';
+            pipe_pc_changer <= '0';
+            reg_pc <= (others => '0');
+        elsif rising_edge(clock) then
+            instruction_class <= s_instruction_class;
+            ALU_OP <= s_ALU_OP;
+            MEM_OP <= s_MEM_OP;
+            MEM_OP_SIZE <= s_MEM_OP_SIZE;
+            OP_SIGN <= s_OP_SIGN;
+            BRANCH_OP_COND <= s_BRANCH_OP_COND;
+            usage_jump <= s_usage_jump;
+            usage_alu <= s_usage_alu;
+            usage_mem <= s_usage_mem;
+            usage_writeback <= s_usage_writeback;
+            pipe_pc_changer <= s_pc_changer;
+            rs1_addr <= s_rs1_addr;
+            rs1_value <= s_rs1_value;
+            rs2_addr <= s_rs2_addr;
+            rs2_value <= s_rs2_value;
+            rd_addr <= s_rd_addr;
+            immediate <= s_immediate;
+            reg_pc <= next_pc;
+        end if;
+    end process;
+  
 end behaviour ;
