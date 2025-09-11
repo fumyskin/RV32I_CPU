@@ -1,7 +1,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
-use work.common.ALL;
 
 entity RegisterFile is
     port(
@@ -29,17 +28,20 @@ architecture behaviour of RegisterFile is
         process(clock)                                              -- only write operations are synchronous
         begin
             if reset = '1' then
-                reg_memory <= (others => (others => '0'))
+                reg_memory <= (others => (others => '0'));
             elsif rising_edge(clock) then
                 if write_enable = '1' then
                     if addr_C /= "00000" then                       -- don't write on x0
-                        reg_memory(addr_C) <= write_C;
+                        reg_memory(to_integer(unsigned(addr_C))) <= write_C;
                     end if;
                 end if;
             end if;
-        end process;
         if read_enable = '1' then                                   -- bit gate to prevent unwanted memory operations
             val_A <= (others => '0') when addr_A = "00000" else reg_memory(to_integer(unsigned(addr_A)));
             val_B <= (others => '0') when addr_B = "00000" else reg_memory(to_integer(unsigned(addr_B)));
+        else
+            val_A <= (others => '0');
+            val_B <= (others => '0');
         end if;
+        end process;
 end architecture;
