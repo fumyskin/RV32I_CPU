@@ -4,7 +4,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 package common is
     type INST_CLASS_T is(
-        R, I, S, B, U, J, NOP, ERR
+        INST_CLASS_R, INST_CLASS_I, INST_CLASS_S, INST_CLASS_B, INST_CLASS_U, INST_CLASS_J, INST_CLASS_NOP, INST_CLASS_ERR
     );
     type ALU_OP_T is(
         OP_ADD,
@@ -26,22 +26,23 @@ package common is
     );
     type MEM_OP_T is(
         OP_LOAD,
-        OP_STORE,
+        OP_STORE
     );
     type MEM_OP_SIZE_T is(
         OP_SIZE_BYTE,
         OP_SIZE_HALFWORD,
-        OP_SIZE_WORD,
+        OP_SIZE_WORD
     );
     type BRANCH_OP_COND_T is(
         OP_BRANCH_EQ,
         OP_BRANCH_NE,
         OP_BRANCH_LT,
         OP_BRANCH_GE,
+        OP_BRANCH_ERR
     );
     type OP_SIGN_T is(
         OP_SIGNED,
-        OP_UNSIGNED,
+        OP_UNSIGNED
     );
 end package common;
 
