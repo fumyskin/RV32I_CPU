@@ -230,10 +230,11 @@ begin
 
             when "0000011" => 
                 v_usage_jump := '0';
-                v_usage_alu := '0';
+                v_usage_alu := '1';
                 v_usage_mem := '1';
                 v_usage_writeback := '1';  
                 v_MEM_OP:= OP_LOAD;
+                v_ALU_OP:= OP_MEM;
                 case(v_funct3) is
                     when "000" =>
                         v_MEM_OP_SIZE:= OP_SIZE_BYTE;
@@ -254,10 +255,11 @@ begin
         
             when "0100011" =>
                 v_usage_jump := '0';
-                v_usage_alu := '0';
+                v_usage_alu := '1';
                 v_usage_mem := '1';
                 v_usage_writeback := '0';  
                 v_MEM_OP := OP_STORE;
+                v_ALU_OP:= OP_MEM;
                 case(v_funct3) is
                     when "000" =>
                         v_MEM_OP_SIZE:= OP_SIZE_BYTE;
@@ -286,10 +288,10 @@ begin
                     when "101" =>
                         v_BRANCH_OP_COND := OP_BRANCH_GE;
                     when "110" =>
-                        v_BRANCH_OP_COND := OP_BRANCH_LT;
+                        v_BRANCH_OP_COND := OP_BRANCH_LTU;
                         v_OP_SIGN:= OP_UNSIGNED;
                     when "111" =>
-                        v_BRANCH_OP_COND := OP_BRANCH_GE;
+                        v_BRANCH_OP_COND := OP_BRANCH_GEU;
                         v_OP_SIGN:= OP_UNSIGNED;
                     when others =>
                         v_pc_changer := '0';
