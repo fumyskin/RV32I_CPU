@@ -1,5 +1,4 @@
-# RVI32_CPU
-Implementation of a CPU processor in VHDL 
+# RVI32_CPU_GPU_FPGA
+Implementation of a CPU processor in VHDL with GPU FMA blocks to display the Mandelbrot set
 
-This is the draft of the github repository for the CPU simulation. Further requirenments for specifications will be added here as specifications are given
 
