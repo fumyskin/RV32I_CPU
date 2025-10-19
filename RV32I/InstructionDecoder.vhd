@@ -15,13 +15,6 @@ entity InstructionDecoder is
         pipe_writeback_enable: in std_logic;                        -- register file, write access from next stages result
         pipe_writeback_addr: in std_logic_vector(4 downto 0);
         pipe_writeback_value: in std_logic_vector(31 downto 0);
-        pipe_res_alu: in std_logic_vector(31 downto 0);             -- input needed for hazards in the pipeline 
-        pipe_res_mem: in std_logic_vector(31 downto 0);
-        pipe_res_rs1_selection: in std_logic_vector(1 downto 0);
-        pipe_res_rs2_selection: in std_logic_vector(1 downto 0);
-        -- 00: value from register file,    (use value read from register file)
-        -- 01: value from alu result,       (ALU_OP result needed, skip register file)
-        -- 10: value from memory result,    (OP_LOAD result needed, skip register file)
         
         rs1_addr: out std_logic_vector(4 downto 0);
         rs1_value: out std_logic_vector(31 downto 0);
@@ -42,7 +35,8 @@ entity InstructionDecoder is
         usage_mem: out std_logic;
         usage_writeback: out std_logic;
         pipe_pc_changer: out std_logic;                             -- flag to signal the pipe controller that the instruction could change PC (branches and jumps)
-        reg_pc: out std_logic_vector(31 downto 0)
+        reg_pc: out std_logic_vector(31 downto 0);
+        regs_dump: out REG_MEMORY_T;
     );
 end entity InstructionDecoder;
 architecture behaviour of InstructionDecoder is    
@@ -74,7 +68,7 @@ architecture behaviour of InstructionDecoder is
     signal s_mem_in_rd_value: std_logic_vector(31 downto 0);
     signal s_mem_in_read_enable: std_logic := '0';
     signal s_mem_in_write_enable: std_logic := '0';
-    
+     
    component RegisterFile is
     port(
         clock: in std_logic;
@@ -86,7 +80,8 @@ architecture behaviour of InstructionDecoder is
         write_C: in std_logic_vector(31 downto 0);
         write_enable: in std_logic;
         val_A: out std_logic_vector(31 downto 0);
-        val_B: out std_logic_vector(31 downto 0)
+        val_B: out std_logic_vector(31 downto 0);
+        regs: out REG_MEMORY_T
     );
     end component;
 begin
@@ -101,19 +96,21 @@ begin
         write_C => s_mem_in_rd_value,
         write_enable => s_mem_in_write_enable,
         val_A => s_mem_out_rs1_value,
-        val_B => s_mem_out_rs2_value
+        val_B => s_mem_out_rs2_value,
+        regs => regs_dump
     );
 
-    decodeInstruction:process(curr_instruction, pipe_writeback_enable, pipe_writeback_addr, pipe_writeback_value, pipe_res_alu, pipe_res_mem, pipe_res_rs1_selection, pipe_res_rs2_selection)
+    decodeInstruction:process(curr_instruction)
         variable v_funct3: std_logic_vector(2 downto 0) := (others => '0');
         variable v_funct7: std_logic_vector(6 downto 0) := (others => '0');
         variable v_rd_addr: std_logic_vector(4 downto 0) := (others => '0');
         variable v_rs1_addr: std_logic_vector(4 downto 0) := (others => '0');
         variable v_rs2_addr: std_logic_vector(4 downto 0) := (others => '0');
         variable v_rd_value: std_logic_vector(31 downto 0);
-        variable v_rs1_value: std_logic_vector(31 downto 0);
-        variable v_rs2_value: std_logic_vector(31 downto 0);
         variable v_immediate: std_logic_vector(31 downto 0);
+        variable v_immediate_12bits: std_logic_vector(11 downto 0);
+        variable v_immediate_13bits: std_logic_vector(12 downto 0);
+        variable v_immediate_21bits: std_logic_vector(20 downto 0);
         
         variable v_instruction_class: INST_CLASS_T := INST_CLASS_NOP;
         variable v_ALU_OP: ALU_OP_T := OP_NOP;        -- OP_ADD, OP_SUB, ...  (use INST_CLASS=INST_CLASS_I to check addi, subi, ...)
@@ -137,12 +134,14 @@ begin
         --      write back rd value [DONE]
         --      map output values [DONE]
 
-        v_rd_addr := curr_instruction(11 downto 7);                 -- pre-map static values (same position in different instruction classes)
-        v_funct3 := curr_instruction(14 downto 12);                 -- they are overwritten according to the instruction type
-        v_funct7 := curr_instruction(31 downto 25);
-        v_rs1_addr := curr_instruction(19 downto 15);
-        v_rs2_addr := curr_instruction(24 downto 20);
+        v_rd_addr      := (others => '0');                          -- pre-map static values (same position in different instruction classes)
+        v_rs1_addr     := (others => '0');                          -- they are overwritten according to the instruction type
+        v_rs2_addr     := (others => '0');
+        v_funct3       := (others => '0');
+        v_funct7       := (others => '0');
+        v_immediate    := (others => '0');
         
+        v_instruction_class := INST_CLASS_ERR;
         v_usage_alu := '1';                                         -- set default values (overwritten in some case)
         v_usage_writeback := '1';
         v_usage_mem := '0';
@@ -164,6 +163,39 @@ begin
                 v_instruction_class := INST_CLASS_U;
             when others =>
                 v_instruction_class := INST_CLASS_ERR;
+        end case;
+        
+        case v_instruction_class is
+            when INST_CLASS_R =>
+                v_rd_addr  := curr_instruction(11 downto 7);
+                v_rs1_addr := curr_instruction(19 downto 15);
+                v_rs2_addr := curr_instruction(24 downto 20);
+                v_funct3   := curr_instruction(14 downto 12);
+                v_funct7   := curr_instruction(31 downto 25);
+        
+            when INST_CLASS_I =>
+                v_rd_addr  := curr_instruction(11 downto 7);
+                v_rs1_addr := curr_instruction(19 downto 15);
+                v_funct3   := curr_instruction(14 downto 12);
+        
+            when INST_CLASS_S =>
+                v_rs1_addr := curr_instruction(19 downto 15);
+                v_rs2_addr := curr_instruction(24 downto 20);
+                v_funct3   := curr_instruction(14 downto 12);
+        
+            when INST_CLASS_B =>
+                v_rs1_addr := curr_instruction(19 downto 15);
+                v_rs2_addr := curr_instruction(24 downto 20);
+                v_funct3   := curr_instruction(14 downto 12);
+        
+            when INST_CLASS_J =>
+                v_rd_addr := curr_instruction(11 downto 7);
+        
+            when INST_CLASS_U =>
+                v_rd_addr := curr_instruction(11 downto 7);
+        
+            when others =>
+                null;
         end case;
         
         case(curr_instruction(6 downto 0)) is                       -- instruction definition
@@ -335,26 +367,19 @@ begin
                 end case;
                     
             when INST_CLASS_S =>
-                case(v_OP_SIGN) is
-                    when OP_SIGNED =>
-                        v_immediate := std_logic_vector(resize(signed(
-                            curr_instruction(31 downto 25) &
-                            curr_instruction(11 downto 7)
-                        ), 32));
-                    when OP_UNSIGNED =>
-                        v_immediate := std_logic_vector(resize(unsigned(
-                            curr_instruction(31 downto 25) &
-                            curr_instruction(11 downto 7)
-                        ), 32));
-                end case;
+                v_immediate_12bits := curr_instruction(31 downto 25) & curr_instruction(11 downto 7);
+                v_immediate := std_logic_vector(resize(signed(
+                    v_immediate_12bits    
+                ), 32));
                     
             when INST_CLASS_B =>
+                v_immediate_13bits := curr_instruction(31) &               -- imm[12]
+                                        curr_instruction(7) &              -- imm[11]
+                                        curr_instruction(30 downto 25) &   -- imm[10:5]
+                                        curr_instruction(11 downto 8) &    -- imm[4:1]
+                                        '0';                               -- imm[0]                     
                 v_immediate := std_logic_vector(resize(signed(
-                    curr_instruction(31) &             -- imm[12]
-                    curr_instruction(7) &              -- imm[11]
-                    curr_instruction(30 downto 25) &   -- imm[10:5]
-                    curr_instruction(11 downto 8) &    -- imm[4:1]
-                    '0'                                -- imm[0]
+                    v_immediate_12bits
                 ), 32));
 
             when INST_CLASS_U =>
@@ -365,12 +390,13 @@ begin
                 -- ), 32);
 
             when INST_CLASS_J =>
+                v_immediate_21bits := curr_instruction(31) & -- imm[20]
+                    curr_instruction(19 downto 12) &        -- imm[19:12]
+                    curr_instruction(20) &                  -- imm[11]
+                    curr_instruction(30 downto 21) &        -- imm[10:1]
+                    '0';                                    -- imm[0]
                 v_immediate := std_logic_vector(resize(signed(
-                    curr_instruction(31) &             -- imm[20]
-                    curr_instruction(19 downto 12) &   -- imm[19:12]
-                    curr_instruction(20) &             -- imm[11]
-                    curr_instruction(30 downto 21) &   -- imm[10:1]
-                    '0'                                -- imm[0]
+                    v_immediate_21bits
                 ), 32));
 
             when INST_CLASS_ERR =>
@@ -395,18 +421,14 @@ begin
         
         case(v_instruction_class) is                                -- asynchronous/immediate registers fetch
             when INST_CLASS_R | INST_CLASS_S | INST_CLASS_B =>
-                if pipe_res_rs1_selection & pipe_res_rs2_selection = "0000" then
-                    s_mem_in_rs1_addr <= v_rs1_addr;
-                    s_mem_in_rs2_addr <= v_rs2_addr;
-                    s_mem_in_read_enable <= '1';
-                end if;
+                s_mem_in_rs1_addr <= v_rs1_addr;
+                s_mem_in_rs2_addr <= v_rs2_addr;
+                s_mem_in_read_enable <= '1';
 
             when  INST_CLASS_I =>
-                s_mem_in_rs2_addr <= "00000";                        -- prevent unwanted readings
-                if pipe_res_rs1_selection = "00" then
-                    s_mem_in_rs1_addr <= v_rs1_addr;
-                    s_mem_in_read_enable <= '1';
-                end if;
+                s_mem_in_rs2_addr <= "00000";                       -- prevent unwanted readings
+                s_mem_in_rs1_addr <= v_rs1_addr;
+                s_mem_in_read_enable <= '1';
 
             when INST_CLASS_U | INST_CLASS_J =>
                 s_mem_in_read_enable <= '0';
@@ -417,24 +439,6 @@ begin
                 s_mem_in_read_enable <= '0';
             when others =>
                 null;
-        end case;
-        case(pipe_res_rs1_selection) is
-            when "00" =>
-                v_rs1_value := s_mem_out_rs1_value;
-            when "01" =>
-                v_rs1_value := pipe_res_alu;
-            when "10" =>
-                v_rs1_value := pipe_res_mem;
-            when others => null;
-        end case;
-        case(pipe_res_rs2_selection) is
-            when "00" =>
-                v_rs2_value := s_mem_out_rs2_value;
-            when "01" =>
-                v_rs2_value := pipe_res_alu;
-            when "10" =>
-                v_rs2_value := pipe_res_mem;
-            when others => null;
         end case;
 
         s_instruction_class <= v_instruction_class;                 -- variables to signals mapping
@@ -449,9 +453,7 @@ begin
         s_usage_writeback <= v_usage_writeback;
         s_pipe_pc_changer <= v_pc_changer;
         s_rs1_addr <= v_rs1_addr;
-        s_rs1_value <= v_rs1_value;
         s_rs2_addr <= v_rs2_addr;
-        s_rs2_value <= v_rs2_value;
         s_rd_addr <= v_rd_addr;
         s_immediate <= v_immediate;
 
@@ -467,7 +469,6 @@ begin
             s_mem_in_rd_addr <= "00000";
             s_mem_in_write_enable <= '0';
         end if;
-
     end process;
 
     pipelineRegisters: process(clock, reset)
@@ -504,13 +505,12 @@ begin
             usage_writeback <= s_usage_writeback;
             pipe_pc_changer <= s_pipe_pc_changer;
             rs1_addr <= s_rs1_addr;
-            rs1_value <= s_rs1_value;
             rs2_addr <= s_rs2_addr;
-            rs2_value <= s_rs2_value;
+            rs1_value <= s_mem_out_rs1_value;
+            rs2_value <= s_mem_out_rs2_value;
             rd_addr <= s_rd_addr;
             immediate <= s_immediate;
             reg_pc <= next_pc;
         end if;
     end process;
-  
 end behaviour ;
