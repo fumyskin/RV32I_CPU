@@ -56,7 +56,6 @@ architecture behaviour of InstructionExecution_tb is
     signal s_tb_ieout_OP_SIGN_out: OP_SIGN_T;
     signal s_tb_ieout_usage_mem_out: std_logic;
     signal s_tb_ieout_usage_writeback_out: std_logic;
-    signal s_tb_ieout_pipe_async_alu_result: std_logic_vector(31 downto 0);
     signal s_tb_ieout_pipe_use_new_pc: std_logic;
     signal s_tb_ieout_pipe_new_pc: std_logic_vector(31 downto 0);
 begin
@@ -80,10 +79,6 @@ begin
         pipe_writeback_enable => s_tb_pipe_writeback_enable,        -- this writeback will be used by the pipe (linking the WriteBack stage to InstructionDecoder)
         pipe_writeback_addr => s_tb_pipe_writeback_addr,            -- it's not used in this test for this reason, writeback signals for operations results are generated in InstructionDecoder
         pipe_writeback_value => s_tb_pipe_writeback_value,
-        pipe_res_alu => s_tb_pipe_res_alu,
-        pipe_res_mem => s_tb_pipe_res_mem,
-        pipe_res_rs1_selection => s_tb_pipe_res_rs1_selection,
-        pipe_res_rs2_selection => s_tb_pipe_res_rs2_selection,
         rs1_addr => s_tb_rs1_addr,
         rs1_value => s_tb_rs1_value,
         rs2_addr => s_tb_rs2_addr,
@@ -140,7 +135,6 @@ begin
         OP_SIGN_out => s_tb_ieout_OP_SIGN_out,
         usage_mem_out => s_tb_ieout_usage_mem_out,
         usage_writeback_out => s_tb_ieout_usage_writeback_out,
-        pipe_async_alu_result => s_tb_ieout_pipe_async_alu_result,
         pipe_use_new_pc => s_tb_ieout_pipe_use_new_pc,
         pipe_new_pc => s_tb_ieout_pipe_new_pc
     );
