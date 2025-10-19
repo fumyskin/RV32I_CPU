@@ -1,6 +1,8 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+library work;
+use work.common.all;
 
 entity RegisterFile is
     port(
@@ -16,12 +18,13 @@ entity RegisterFile is
         write_enable: in std_logic;
 
         val_A: out std_logic_vector(31 downto 0);
-        val_B: out std_logic_vector(31 downto 0)
+        val_B: out std_logic_vector(31 downto 0);
+        
+        regs: out REG_MEMORY_T
     );
 end entity;
 
 architecture behaviour of RegisterFile is
-    type REG_MEMORY_T is array (0 to 31) of std_logic_vector(31 downto 0); -- 1024 bit memory definition (32x32)
     signal reg_memory: REG_MEMORY_T := (others => (others => '0')); -- start with all registers to 0
     
     begin
@@ -43,5 +46,6 @@ architecture behaviour of RegisterFile is
             val_A <= (others => '0');
             val_B <= (others => '0');
         end if;
-        end process;
+    end process;
+    regs <= reg_memory;
 end architecture;
