@@ -137,16 +137,17 @@ architecture Behavioral of FMAMemBuffer is
                         if (abc_valid_in(i*3 + 2) == '1') then
                             c_valid_reg(i) <= '1';
                         end if;
-
+                        
+                        -- verify if as and bs are valid
                         if (abc_valid_in(i*3) == '1' AND abc_valid_in(i*3 + 1) == '1') then
                             fma_ready <= '1' 
                         end if;
                         
-                        -- if abc_valid 
+                        -- if abc_valid load into fma module
                         for j in 0 to LENGTH-1 loop
                             for k in 0 to 2 loop
                                 if (abc_valid_in(i*3 + k) == '1') then
-                                    abc(i*3*LENGTH + k*LENGTH + j) <= abc_input(k*3*LENGTH + k*LENGTH + j); -- check indexes!
+                                    abc(i*3*LENGTH + k*LENGTH + j) <= abc_input(i*3*LENGTH + k*LENGTH + j); -- check indexes!
                                 end if;
                             end loop;
                         end loop;
@@ -157,7 +158,7 @@ architecture Behavioral of FMAMemBuffer is
                         abc_valid_out <= '1';
 
                         for i in 0 to FMA_NUM-1 loop
-                            c_valid_out(i) <= c_valid_reg(i);
+                            c_valid_out(i) <= c_valid_reg(i);  -- we recycle old c ? 
                             for j in 0 to 3*LENGTH-1 loop
                                 abc_output(i*3*LENGTH + j) <= abc(i*3*LENGTH + j);
                             end loop;
