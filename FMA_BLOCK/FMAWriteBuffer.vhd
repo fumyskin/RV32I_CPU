@@ -48,7 +48,7 @@ architecture Behavioral of FMAWriteBuffer is
     begin
 
         -- MUX increment_phrase to correct default output
-        increment_phrase <= '1' when unsigned(fma_valid_out)/= 0  else '0';
+        increment_phrase <= '1' when unsigned(fma_valid_out)/= 0  else '0'; -- unsigned converts std_logic_vector to numeric
 
         process(clk)
         begin
@@ -58,25 +58,31 @@ architecture Behavioral of FMAWriteBuffer is
                     phrase_in <= 0;
                     line_out <= (others => '0');
                 else 
-                    if (phrase_in /= 3) then
+                    if (phrase_in < 3) then
                         if(increment_phrase = '1') then
-                            phrase_in <= phrase_in + 1;
-                            if (phrase_in = 2) then
-                                line_valid <= '1';
-                            end if; -- When the module has just finished collecting the third phrase (phrases 0, 1, and 2), sets lined_valid
                             for i in 0 to FMA_NUM-1 loop
-                                line_out(
+                                line_out(  -- to check logic
                                         WRITE_BUFFER_OUTPUT(i, phrase_in) + WORD_LENGTH - 1 downto
                                         WRITE_BUFFER_OUTPUT(i, phrase_in)
                                 ) <= fma_out((i+1)*WORD_LENGTH - 1 downto i*WORD_LENGTH);
                             end loop;
+
+                            phrase_in <= phrase_in + 1;
+
+                            if phrase_in = 2 then
+                                line_valid_reg <= '1';
+                            else
+                                line_valid_reg <= '0';
+                            end if;
                         end if;
+                    else 
+                        -- Reset for next line
+                        phrase_in      <= 0;
+                        line_out_reg   <= (others => '0');
+                        line_valid_reg <= '0';
                     end if;
                 end if;
-
-                line_valid <= '0';
-                phrase_in <= 0;
-                line_out <= (others => '0');
+                
             end if;
         end process;
 
