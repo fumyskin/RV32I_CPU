@@ -7,7 +7,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity FMA is
     generic (
         LENGTH: integer := 16;  -- width of floating point numbers coming in
-        EXPONENT: int3eger := 10 -- width of exponent
+        EXPONENT: integer := 10 -- width of exponent
     );
     port(
         clk: in std_logic;

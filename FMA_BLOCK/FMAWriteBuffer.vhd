@@ -48,6 +48,7 @@ architecture Behavioral of FMAWriteBuffer is
     begin
 
         -- MUX increment_phrase to correct default output
+        -- incrase phrase counter only when at leas ONE FMA gives NEW DATA (000 -> no new data has arrived) 
         increment_phrase <= '1' when unsigned(fma_valid_out)/= 0  else '0'; -- unsigned converts std_logic_vector to numeric
 
         process(clk)

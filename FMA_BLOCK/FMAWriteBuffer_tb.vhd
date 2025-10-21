@@ -65,12 +65,20 @@ begin
         -- first batch
         fma_out   <= x"5EAA5EAA5EAA";   -- initialize fma_out
         fma_valid_out <= "101";          -- define whether the fma_blocks are valid or not 
-        wait for 50 ns;
+        wait for 20 ns;
 
         -- second batch 
         fma_out <= x"51AB5EBA2FAA";
         fma_valid_out <= "111";
-        wait for 10 us;
+        wait for 20 us;
+
+        fma_out   <= x"1FABB634C5EF";   
+        fma_valid_out <= "000";         
+        wait for 20 ns;
+
+        fma_out   <= x"BBBBB634CDDD";
+        fma_valid_out <= "011";          
+        wait for 20 ns;
 
         -- End simulation
         wait;
