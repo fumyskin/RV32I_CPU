@@ -4,10 +4,10 @@ use IEEE.NUMERIC_STD.ALL;
 library work;
 use work.common.all;
 
-entity MemoryAccess_tb is
-end entity MemoryAccess_tb;
+entity FullISAJumps_tb is
+end entity FullISAJumps_tb;
 
-architecture behaviour of MemoryAccess_tb is
+architecture behaviour of FullISAJumps_tb is
     constant CLOCK_PERIOD : time := 10 ns;
     constant TEST_CYCLES : integer := 6;
     signal RV32I_OPERATION : string(1 to 22);
@@ -18,8 +18,7 @@ architecture behaviour of MemoryAccess_tb is
     signal s_tb_next_pc_1: std_logic_vector(31 downto 0) := (others => '0');
     signal s_tb_next_pc_2: std_logic_vector(31 downto 0) := (others => '0');
     signal s_tb_next_pc_3: std_logic_vector(31 downto 0) := (others => '0');
-    signal s_tb_next_pc_4: std_logic_vector(31 downto 0) := (others => '0');
-    signal s_tb_curr_instruction: std_logic_vector(31 downto 0) := (others => '0');
+    signal s_tb_curr_instruction: std_logic_vector(31 downto 0);
 
     signal s_tb_rs1_addr: std_logic_vector(4 downto 0) := (others => '0');
     signal s_tb_rs1_value: std_logic_vector(31 downto 0);
@@ -38,7 +37,6 @@ architecture behaviour of MemoryAccess_tb is
     signal s_tb_usage_mem: std_logic;
     signal s_tb_usage_writeback: std_logic;
     signal s_tb_pipe_pc_changer: std_logic;
-    signal s_tb_reg_pc: std_logic_vector(31 downto 0) := (others => '0');
     signal s_tb_regs_dump: REG_MEMORY_T;
 
     signal s_tb_ieout_rs1_addr_out: std_logic_vector(4 downto 0);
@@ -53,8 +51,6 @@ architecture behaviour of MemoryAccess_tb is
     signal s_tb_ieout_OP_SIGN_out: OP_SIGN_T;
     signal s_tb_ieout_usage_mem_out: std_logic;
     signal s_tb_ieout_usage_writeback_out: std_logic;
-    signal s_tb_ieout_pipe_use_new_pc: std_logic;
-    signal s_tb_ieout_pipe_new_pc: std_logic_vector(31 downto 0);
 
     signal s_tb_pipe_new_pc_1: std_logic_vector(31 downto 0);
     signal s_tb_pipe_use_new_pc_1: std_logic;
@@ -84,7 +80,7 @@ begin
     port map(
         clock => clock,
         reset => reset,
-        enable_fetch => '1', 
+        enable_fetch => '1',
         use_new_pc => s_tb_pipe_use_new_pc_2,
         new_pc => s_tb_pipe_new_pc_2,
         curr_instruction => s_tb_curr_instruction,
@@ -192,56 +188,46 @@ begin
         pipe_writeback_value_out => s_tb_memout_pipe_writeback_value_out
     );
 
-    instructionExecutionTest:process                                -- it was faster and more complete (and even easier, lol) to instantiate and connect both entities
-    begin                                                           -- it's the same process as InstructionDecoderTest, just with another entity connected (will check the output signals of InstructionExecution)
-        reset <= '1';
+    instructionExecutionTest:process
+    begin
         RV32I_OPERATION <= "RESET                 ";
         wait until rising_edge(clock);
         wait until rising_edge(clock);
         reset <= '0';
         
-        RV32I_OPERATION <= "addi x1, x0, 7        ";
-        s_tb_curr_instruction <= x"00700093";
-
-        RV32I_OPERATION <= "addi x2, x0, 8        ";
-        s_tb_curr_instruction <= x"00800113";
-
-        RV32I_OPERATION <= "addi x3, x0, 9        ";
-        s_tb_curr_instruction <= x"00900193";
-
-        RV32I_OPERATION <= "addi x4, x0, 10       ";
-        s_tb_curr_instruction <= x"00A00213";
+        -- RV32I_OPERATION <= "addi x1, x0, 7        ";
         
-        RV32I_OPERATION <= "addi x5, x0, 11       ";
-        s_tb_curr_instruction <= x"00B00293";
-
-        RV32I_OPERATION <= "slt x9, x1, x2        ";
-        s_tb_curr_instruction <= x"0020a4b3";
+        -- RV32I_OPERATION <= "addi x2, x0, 8        ";
         
-        RV32I_OPERATION <= "sw x3, 64(x0)         ";                -- Write x3 value (9 dec) to byte address 040hex (64dec) in 3 clock cycles
-        s_tb_curr_instruction <= x"04302023";
+        -- RV32I_OPERATION <= "addi x3, x0, 9        ";
         
-        RV32I_OPERATION <= "addi x6, x0, 12       ";                -- "padding" instructions as there's no control of pipe hazards (yet)
-        s_tb_curr_instruction <= x"00C00313";
-
-        RV32I_OPERATION <= "slt x7, x1, x2        ";
-        s_tb_curr_instruction <= x"0020A3B3";
-
-        RV32I_OPERATION <= "addi x6, x0, 12       ";
-        s_tb_curr_instruction <= x"00C00313";
+        -- RV32I_OPERATION <= "addi x4, x0, 10       ";
         
-        RV32I_OPERATION <= "lw x1, 64(x0)         ";                -- the value 09 is expected in the register x1 after 4 clock cycles 
-        s_tb_curr_instruction <= x"04002083";
+        -- RV32I_OPERATION <= "addi x5, x0, 11       ";
         
-        -- expected register values:
-        -- x1 -> 7 |>  9
-        -- x2 -> 8
-        -- x3 -> 9
-        -- x4 -> a
-        -- x5 -> b
-        -- x6 -> c |> c
-        -- x7 -> 1
-        -- x9 -> 1
+        -- RV32I_OPERATION <= "slt x9, x1, x2        ";
+        
+        -- RV32I_OPERATION <= "sw x3, 64(x0)         ";                -- Write x3 value (9 dec) to byte address 040hex (64dec) in 3 clock cycles
+        
+        -- RV32I_OPERATION <= "addi x6, x0, 12       ";                -- "padding" instructions as there's no control of pipe hazards (yet)
+        
+        -- RV32I_OPERATION <= "slt x7, x1, x2        ";
+        
+        -- RV32I_OPERATION <= "addi x6, x0, 12       ";
+        
+        -- RV32I_OPERATION <= "lw x1, 64(x0)         ";                -- the value 09 is expected in the register x1 after 4 clock cycles 
+        
+        -- expected register values: ([o] -> to fix, [x] -> correct)
+        -- [x]  x0 -> 0
+        -- [x]  x1 -> 7 |>  9
+        -- [x]  x2 -> 8
+        -- [x]  x3 -> 9
+        -- [x]  x4 -> a
+        -- [x]  x5 -> b
+        -- [x]  x6 -> c |> c
+        -- [x]  x7 -> 1
+        -- [x]  x8 -> 0
+        -- [x]  x9 -> 1
         wait;
     end process;
 
