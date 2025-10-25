@@ -34,6 +34,7 @@ entity InstructionExecution is
         rs2_value_out: out std_logic_vector(31 downto 0);
         rd_addr_out: out std_logic_vector(4 downto 0);
         rd_value_out: out std_logic_vector(31 downto 0);
+        reg_pc: out std_logic_vector(31 downto 0);
         mem_addr_out: out std_logic_vector(31 downto 0);
         MEM_OP_out: out MEM_OP_T;
         MEM_OP_SIZE_out: out MEM_OP_SIZE_T;
@@ -144,15 +145,15 @@ begin
                         case OP_SIGN is
                             when OP_SIGNED =>
                                 if (v_rs1_signed_value < v_rs2_signed_value) then
-                                    v_alu_result := (others => '0');
-                                else
                                     v_alu_result := x"00000001";
+                                else
+                                    v_alu_result := (others => '0');
                                 end if;                                
                             when others =>
                                 if (v_rs1_unsigned_value < v_rs2_unsigned_value) then
-                                    v_alu_result := (others => '0');
-                                else
                                     v_alu_result := x"00000001";
+                                else
+                                    v_alu_result := (others => '0');
                                 end if;
                         end case;
                     when OP_LUI => 
@@ -210,6 +211,7 @@ begin
             end if;
         end if;
         rd_value_out <= v_rd_value;
+        reg_pc <= next_pc;
         pipe_new_pc <= v_new_pc;
         s_alu_result <= v_alu_result;
     end process;

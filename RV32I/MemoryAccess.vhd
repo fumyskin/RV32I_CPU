@@ -15,6 +15,9 @@ port (
     rs2_value_in: in std_logic_vector(31 downto 0);                 -- the value to store (s[w|h|b] rs2, off(rs1))
     rd_addr_in: in std_logic_vector(4 downto 0);
     rd_value_in: in std_logic_vector(31 downto 0);
+    next_pc: in std_logic_vector(31 downto 0);
+    pipe_new_pc: in std_logic_vector(31 downto 0);
+    pipe_use_new_pc: in std_logic;
 
     usage_mem_in: in std_logic;
     mem_addr_in: in std_logic_vector(31 downto 0);
@@ -27,7 +30,8 @@ port (
     rs1_value_out: out std_logic_vector(31 downto 0);
     rs2_addr_out: out std_logic_vector(4 downto 0);
     rs2_value_out: out std_logic_vector(31 downto 0);
-
+    pipe_new_pc_out: out std_logic_vector(31 downto 0);
+    pipe_use_new_pc_out: out std_logic;
     pipe_writeback_enable_out: out std_logic;                       -- writeback as final step of instructions execution
     pipe_writeback_addr_out: out std_logic_vector(4 downto 0);
     pipe_writeback_value_out: out std_logic_vector(31 downto 0)
@@ -112,6 +116,8 @@ begin
             rs1_value_out <= rs1_value_in;
             rs2_addr_out <= rs2_addr_in;
             rs2_value_out <= rs2_value_in;
+            pipe_new_pc_out <= pipe_new_pc; 
+            pipe_use_new_pc_out <= pipe_use_new_pc; 
             pipe_writeback_enable_out <= usage_writeback_in;
             pipe_writeback_addr_out <= rd_addr_in;
             pipe_writeback_value_out <= v_pipe_writeback_value;
