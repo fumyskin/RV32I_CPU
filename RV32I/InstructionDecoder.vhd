@@ -30,11 +30,10 @@ entity InstructionDecoder is
         OP_SIGN: out OP_SIGN_T;
         BRANCH_OP_COND: out BRANCH_OP_COND_T;
 
-        usage_jump: out std_logic;
-        usage_alu: out std_logic;
         usage_mem: out std_logic;
         usage_writeback: out std_logic;
-        pipe_pc_changer: out std_logic;                             -- flag to signal the pipe controller that the instruction could change PC (branches and jumps)
+        pipe_pc_changer_op: out std_logic;
+        pipe_is_pc_changer: out std_logic;                             -- flag to signal the pipe controller that the instruction could change PC (branches and jumps)
         reg_pc: out std_logic_vector(31 downto 0);
         regs_dump: out REG_MEMORY_T;
     );
@@ -54,11 +53,10 @@ architecture behaviour of InstructionDecoder is
     signal s_OP_SIGN: OP_SIGN_T := OP_UNSIGNED;
     signal s_BRANCH_OP_COND: BRANCH_OP_COND_T := OP_BRANCH_NE;
 
-    signal s_usage_jump: std_logic := '0';
-    signal s_usage_alu: std_logic := '0';
     signal s_usage_mem: std_logic := '0';
     signal s_usage_writeback: std_logic := '0';
-    signal s_pipe_pc_changer: std_logic := '0';
+    signal s_pipe_is_pc_changer: std_logic := '0';
+    signal s_pipe_pc_changer_op: std_logic := '0';
 
     signal s_mem_in_rs1_addr: std_logic_vector(4 downto 0) := (others => '0');
     signal s_mem_out_rs1_value: std_logic_vector(31 downto 0);
@@ -101,6 +99,7 @@ begin
     );
 
     decodeInstruction:process(curr_instruction)
+        variable v_opcode: std_logic_vector(6 downto 0);      
         variable v_funct3: std_logic_vector(2 downto 0) := (others => '0');
         variable v_funct7: std_logic_vector(6 downto 0) := (others => '0');
         variable v_rd_addr: std_logic_vector(4 downto 0) := (others => '0');
@@ -119,9 +118,8 @@ begin
         variable v_OP_SIGN: OP_SIGN_T := OP_UNSIGNED;      -- OP_SIGNED, OP_UNSIGNED (to get lbu, lhu, sltu, ...)
         variable v_BRANCH_OP_COND: BRANCH_OP_COND_T := OP_BRANCH_NE;
         
-        variable v_pc_changer: std_logic := '0';
-        variable v_usage_jump: std_logic := '0';
-        variable v_usage_alu: std_logic := '0';
+        variable v_pipe_is_pc_changer: std_logic := '0';
+    
         variable v_usage_mem: std_logic := '0';
         variable v_usage_writeback: std_logic := '0';
     begin
@@ -141,14 +139,13 @@ begin
         v_funct7       := (others => '0');
         v_immediate    := (others => '0');
         
+        v_opcode := curr_instruction(6 downto 0);
         v_instruction_class := INST_CLASS_ERR;
-        v_usage_alu := '1';                                         -- set default values (overwritten in some case)
         v_usage_writeback := '1';
         v_usage_mem := '0';
-        v_pc_changer := '0';
         v_OP_SIGN := OP_SIGNED;
 
-        case(curr_instruction(6 downto 0)) is                       -- instruction class definition
+        case(v_opcode) is                       -- instruction class definition
             when "0110011" =>
                 v_instruction_class := INST_CLASS_R;
             when "0010011" | "0000011" | "1110011" | "1100111"=> 
@@ -198,10 +195,8 @@ begin
                 null;
         end case;
         
-        case(curr_instruction(6 downto 0)) is                       -- instruction definition
+        case(v_opcode) is                       -- instruction definition
             when "0110011" | "0010011" =>
-                v_usage_jump := '0';
-                v_usage_alu := '1';
                 v_usage_mem := '0';
                 v_usage_writeback := '1';  
                 case(v_funct3) is
@@ -247,22 +242,16 @@ begin
                 end case;
         
             when "0110111" =>
-                v_usage_jump := '0';
-                v_usage_alu := '1';
                 v_usage_mem := '0';
                 v_usage_writeback := '1';  
                 v_ALU_OP:= OP_LUI;
 
             when "0010111" =>
-                v_usage_jump := '0';
-                v_usage_alu := '1';
                 v_usage_mem := '0';
                 v_usage_writeback := '1';  
                 v_ALU_OP:= OP_AUIPC;
 
             when "0000011" => 
-                v_usage_jump := '0';
-                v_usage_alu := '1';
                 v_usage_mem := '1';
                 v_usage_writeback := '1';  
                 v_MEM_OP:= OP_LOAD;
@@ -286,8 +275,6 @@ begin
                 end case;
         
             when "0100011" =>
-                v_usage_jump := '0';
-                v_usage_alu := '1';
                 v_usage_mem := '1';
                 v_usage_writeback := '0';  
                 v_MEM_OP := OP_STORE;
@@ -305,9 +292,6 @@ begin
                 end case;
             
             when "1100011" =>
-                v_pc_changer := '1';
-                v_usage_jump := '0';                                -- there are no active flag for branch operations
-                v_usage_alu := '0';
                 v_usage_mem := '0';
                 v_usage_writeback := '0';
                 case(v_funct3) is
@@ -326,14 +310,10 @@ begin
                         v_BRANCH_OP_COND := OP_BRANCH_GEU;
                         v_OP_SIGN:= OP_UNSIGNED;
                     when others =>
-                        v_pc_changer := '0';
                         v_BRANCH_OP_COND := OP_BRANCH_NE;
                 end case;
                     
             when "1101111" | "1100111" => -- JAL (class INST_CLASS_J) | JALR (class INST_CLASS_I)
-                v_pc_changer := '1';
-                v_usage_jump := '1';
-                v_usage_alu := '0';
                 v_usage_mem := '0';
                 v_usage_writeback := '1';  
                 if v_instruction_class = INST_CLASS_J then
@@ -352,6 +332,14 @@ begin
         --             -- if imm = 0x0 -> ECALL
         --             -- elif imm = 0x1 -> EBREAK
         --     end case;
+        end case;
+
+
+        case(v_opcode) is                                           -- jumps and branches check for pipe flag
+            when "1100011" | "1101111" | "1100111" =>
+                v_pipe_is_pc_changer := '1';
+            when others =>
+                v_pipe_is_pc_changer := '0';
         end case;
 
         case(v_instruction_class) is                                -- immediate mapping
@@ -401,7 +389,6 @@ begin
 
             when INST_CLASS_ERR =>
                 v_immediate := (others => '0');
-                v_usage_alu := '0';
                 v_usage_mem := '0';
                 v_usage_writeback := '0';
                 v_ALU_OP := OP_ERR;                                 -- signal the invalid instruction
@@ -409,7 +396,6 @@ begin
             
             when INST_CLASS_NOP =>
                 v_immediate := (others => '0');
-                v_usage_alu := '0';
                 v_usage_mem := '0';
                 v_usage_writeback := '0';
                 v_ALU_OP := OP_NOP;
@@ -447,11 +433,10 @@ begin
         s_MEM_OP_SIZE <= v_MEM_OP_SIZE;
         s_OP_SIGN <= v_OP_SIGN;
         s_BRANCH_OP_COND <= v_BRANCH_OP_COND;
-        s_usage_jump <= v_usage_jump;
-        s_usage_alu <= v_usage_alu;
         s_usage_mem <= v_usage_mem;
         s_usage_writeback <= v_usage_writeback;
-        s_pipe_pc_changer <= v_pc_changer;
+        s_pipe_is_pc_changer <= v_pipe_is_pc_changer;
+        s_pipe_pc_changer_op <= v_pipe_is_pc_changer;
         s_rs1_addr <= v_rs1_addr;
         s_rs2_addr <= v_rs2_addr;
         s_rd_addr <= v_rd_addr;
@@ -486,11 +471,10 @@ begin
             MEM_OP_SIZE <= OP_SIZE_WORD;
             OP_SIGN <= OP_UNSIGNED;
             BRANCH_OP_COND <= OP_BRANCH_NE;
-            usage_jump <= '0';
-            usage_alu <= '0';
             usage_mem <= '0';
             usage_writeback <= '0';
-            pipe_pc_changer <= '0';
+            pipe_is_pc_changer <= '0';
+            pipe_pc_changer_op <= '0';
             reg_pc <= (others => '0');
         elsif rising_edge(clock) then
             instruction_class <= s_instruction_class;
@@ -499,11 +483,10 @@ begin
             MEM_OP_SIZE <= s_MEM_OP_SIZE;
             OP_SIGN <= s_OP_SIGN;
             BRANCH_OP_COND <= s_BRANCH_OP_COND;
-            usage_jump <= s_usage_jump;
-            usage_alu <= s_usage_alu;
             usage_mem <= s_usage_mem;
             usage_writeback <= s_usage_writeback;
-            pipe_pc_changer <= s_pipe_pc_changer;
+            pipe_is_pc_changer <= s_pipe_is_pc_changer;
+            pipe_pc_changer_op <= s_pipe_pc_changer_op;
             rs1_addr <= s_rs1_addr;
             rs2_addr <= s_rs2_addr;
             rs1_value <= s_mem_out_rs1_value;

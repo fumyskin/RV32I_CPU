@@ -19,6 +19,8 @@ architecture behaviour of FullISAJumps_tb is
     signal s_tb_next_pc_2: std_logic_vector(31 downto 0) := (others => '0');
     signal s_tb_next_pc_3: std_logic_vector(31 downto 0) := (others => '0');
     signal s_tb_curr_instruction: std_logic_vector(31 downto 0);
+    signal s_tb_async_branch_not_taken: std_logic := '0';
+    signal s_tb_is_pc_changer: std_logic := '0';
 
     signal s_tb_rs1_addr: std_logic_vector(4 downto 0) := (others => '0');
     signal s_tb_rs1_value: std_logic_vector(31 downto 0);
@@ -32,12 +34,11 @@ architecture behaviour of FullISAJumps_tb is
     signal s_tb_MEM_OP_SIZE: MEM_OP_SIZE_T;
     signal s_tb_OP_SIGN: OP_SIGN_T;
     signal s_tb_BRANCH_OP_COND: BRANCH_OP_COND_T;
-    signal s_tb_usage_jump: std_logic;
-    signal s_tb_usage_alu: std_logic;
     signal s_tb_usage_mem: std_logic;
     signal s_tb_usage_writeback: std_logic;
-    signal s_tb_pipe_pc_changer: std_logic;
     signal s_tb_regs_dump: REG_MEMORY_T;
+    signal s_tb_pipe_is_pc_changer: std_logic;
+    signal s_tb_pipe_pc_changer_op: std_logic;
 
     signal s_tb_ieout_rs1_addr_out: std_logic_vector(4 downto 0);
     signal s_tb_ieout_rs1_value_out: std_logic_vector(31 downto 0);
@@ -52,10 +53,9 @@ architecture behaviour of FullISAJumps_tb is
     signal s_tb_ieout_usage_mem_out: std_logic;
     signal s_tb_ieout_usage_writeback_out: std_logic;
 
-    signal s_tb_pipe_new_pc_1: std_logic_vector(31 downto 0);
-    signal s_tb_pipe_use_new_pc_1: std_logic;
-    signal s_tb_pipe_new_pc_2: std_logic_vector(31 downto 0);
-    signal s_tb_pipe_use_new_pc_2: std_logic;
+    signal s_tb_pipe_pc_changer_done: std_logic;
+    signal s_tb_pipe_new_pc: std_logic_vector(31 downto 0);
+    signal s_tb_pipe_use_new_pc: std_logic;
 
     signal s_tb_memout_pipe_writeback_enable_out: std_logic;
     signal s_tb_memout_pipe_writeback_addr_out: std_logic_vector(4 downto 0);
@@ -81,8 +81,10 @@ begin
         clock => clock,
         reset => reset,
         enable_fetch => '1',
-        use_new_pc => s_tb_pipe_use_new_pc_2,
-        new_pc => s_tb_pipe_new_pc_2,
+        is_pc_changer => s_tb_pipe_is_pc_changer,
+        pipe_pc_changer_done => s_tb_pipe_pc_changer_done,
+        pipe_use_new_pc => s_tb_pipe_use_new_pc,
+        pipe_new_pc => s_tb_pipe_new_pc,
         curr_instruction => s_tb_curr_instruction,
         reg_pc => s_tb_next_pc_1
     );
@@ -108,15 +110,14 @@ begin
         MEM_OP_SIZE => s_tb_MEM_OP_SIZE,
         OP_SIGN => s_tb_OP_SIGN,
         BRANCH_OP_COND => s_tb_BRANCH_OP_COND,
-        usage_jump => s_tb_usage_jump,
-        usage_alu => s_tb_usage_alu,
         usage_mem => s_tb_usage_mem,
         usage_writeback => s_tb_usage_writeback,
-        pipe_pc_changer => s_tb_pipe_pc_changer,
+        pipe_is_pc_changer => s_tb_pipe_is_pc_changer,
+        pipe_pc_changer_op => s_tb_pipe_pc_changer_op,
         reg_pc => s_tb_next_pc_2,
         regs_dump => s_tb_regs_dump
     );
-
+    
     instructionExecutionEntity: entity work.InstructionExecution
     port map(
         clock => clock,
@@ -135,11 +136,9 @@ begin
         MEM_OP_SIZE => s_tb_MEM_OP_SIZE,
         OP_SIGN => s_tb_OP_SIGN,
         BRANCH_OP_COND => s_tb_BRANCH_OP_COND,
-        usage_jump => s_tb_usage_jump,
-        usage_alu => s_tb_usage_alu,
         usage_mem => s_tb_usage_mem,
         usage_writeback => s_tb_usage_writeback,
-        pipe_pc_changer => s_tb_pipe_pc_changer,
+        pipe_pc_changer => s_tb_pipe_pc_changer_op,
 
         rs1_addr_out => s_tb_ieout_rs1_addr_out,
         rs1_value_out => s_tb_ieout_rs1_value_out,
@@ -154,8 +153,9 @@ begin
         OP_SIGN_out => s_tb_ieout_OP_SIGN_out,
         usage_mem_out => s_tb_ieout_usage_mem_out,
         usage_writeback_out => s_tb_ieout_usage_writeback_out,
-        pipe_use_new_pc => s_tb_pipe_use_new_pc_1,
-        pipe_new_pc => s_tb_pipe_new_pc_1
+        pipe_pc_changer_done => s_tb_pipe_pc_changer_done,
+        pipe_use_new_pc => s_tb_pipe_use_new_pc,
+        pipe_new_pc => s_tb_pipe_new_pc
     );
 
     memoryAccessEntity: entity work.MemoryAccess
@@ -169,8 +169,6 @@ begin
         rd_addr_in => s_tb_ieout_rd_addr_out,
         rd_value_in => s_tb_ieout_rd_value_out,
         next_pc => s_tb_next_pc_3,
-        pipe_new_pc => s_tb_pipe_new_pc_1,
-        pipe_use_new_pc => s_tb_pipe_use_new_pc_1,
         usage_mem_in => s_tb_ieout_usage_mem_out,
         mem_addr_in => s_tb_ieout_mem_addr_out,
         MEM_OP_in => s_tb_ieout_MEM_OP_out,
@@ -181,8 +179,6 @@ begin
         rs1_value_out => s_tb_memout_rs1_value_out,
         rs2_addr_out => s_tb_memout_rs2_addr_out,
         rs2_value_out => s_tb_memout_rs2_value_out,
-        pipe_new_pc_out => s_tb_pipe_new_pc_2,
-        pipe_use_new_pc_out => s_tb_pipe_use_new_pc_2,
         pipe_writeback_enable_out => s_tb_memout_pipe_writeback_enable_out,   
         pipe_writeback_addr_out => s_tb_memout_pipe_writeback_addr_out,
         pipe_writeback_value_out => s_tb_memout_pipe_writeback_value_out

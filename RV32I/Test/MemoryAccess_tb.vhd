@@ -3,7 +3,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 library work;
 use work.common.all;
-
+<
 entity MemoryAccess_tb is
 end entity MemoryAccess_tb;
 
@@ -34,7 +34,6 @@ architecture behaviour of MemoryAccess_tb is
     signal s_tb_OP_SIGN: OP_SIGN_T;
     signal s_tb_BRANCH_OP_COND: BRANCH_OP_COND_T;
     signal s_tb_usage_jump: std_logic;
-    signal s_tb_usage_alu: std_logic;
     signal s_tb_usage_mem: std_logic;
     signal s_tb_usage_writeback: std_logic;
     signal s_tb_pipe_pc_changer: std_logic;
@@ -113,7 +112,6 @@ begin
         OP_SIGN => s_tb_OP_SIGN,
         BRANCH_OP_COND => s_tb_BRANCH_OP_COND,
         usage_jump => s_tb_usage_jump,
-        usage_alu => s_tb_usage_alu,
         usage_mem => s_tb_usage_mem,
         usage_writeback => s_tb_usage_writeback,
         pipe_pc_changer => s_tb_pipe_pc_changer,
@@ -140,7 +138,6 @@ begin
         OP_SIGN => s_tb_OP_SIGN,
         BRANCH_OP_COND => s_tb_BRANCH_OP_COND,
         usage_jump => s_tb_usage_jump,
-        usage_alu => s_tb_usage_alu,
         usage_mem => s_tb_usage_mem,
         usage_writeback => s_tb_usage_writeback,
         pipe_pc_changer => s_tb_pipe_pc_changer,
