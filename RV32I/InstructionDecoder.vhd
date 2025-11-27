@@ -2,498 +2,167 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 library work;
-use work.common.all;
+use work.common.ALL;
 
-entity InstructionDecoder is
-    port(
-        clock: in std_logic;                                        -- mapped directly to the register file (memory)
-        reset: in std_logic;
-
-        curr_instruction: in std_logic_vector(31 downto 0);
-        next_pc: in std_logic_vector(31 downto 0);
-
-        pipe_writeback_enable: in std_logic;                        -- register file, write access from next stages result
-        pipe_writeback_addr: in std_logic_vector(4 downto 0);
-        pipe_writeback_value: in std_logic_vector(31 downto 0);
-        
-        rs1_addr: out std_logic_vector(4 downto 0);
-        rs1_value: out std_logic_vector(31 downto 0);
-        rs2_addr: out std_logic_vector(4 downto 0);
-        rs2_value: out std_logic_vector(31 downto 0);
-        rd_addr: out std_logic_vector(4 downto 0);
-        immediate: out std_logic_vector(31 downto 0);
-
-        instruction_class: out INST_CLASS_T;
-        ALU_OP: out ALU_OP_T;
-        MEM_OP: out MEM_OP_T;
-        MEM_OP_SIZE: out MEM_OP_SIZE_T;
-        OP_SIGN: out OP_SIGN_T;
-        BRANCH_OP_COND: out BRANCH_OP_COND_T;
-
-        usage_mem: out std_logic;
-        usage_writeback: out std_logic;
-        pipe_pc_changer_op: out std_logic;
-        pipe_is_pc_changer: out std_logic;                             -- flag to signal the pipe controller that the instruction could change PC (branches and jumps)
-        reg_pc: out std_logic_vector(31 downto 0);
-        regs_dump: out REG_MEMORY_T;
-    );
-end entity InstructionDecoder;
-architecture behaviour of InstructionDecoder is    
-    signal s_rs1_addr: std_logic_vector(4 downto 0) := (others => '0');
-    signal s_rs1_value: std_logic_vector(31 downto 0);
-    signal s_rs2_addr: std_logic_vector(4 downto 0) := (others => '0');
-    signal s_rs2_value: std_logic_vector(31 downto 0);
-    signal s_rd_addr: std_logic_vector(4 downto 0) := (others => '0');
-    signal s_immediate: std_logic_vector(31 downto 0);
-    
-    signal s_instruction_class: INST_CLASS_T := INST_CLASS_NOP;
-    signal s_ALU_OP: ALU_OP_T := OP_NOP;
-    signal s_MEM_OP: MEM_OP_T := OP_LOAD;
-    signal s_MEM_OP_SIZE: MEM_OP_SIZE_T := OP_SIZE_WORD;
-    signal s_OP_SIGN: OP_SIGN_T := OP_UNSIGNED;
-    signal s_BRANCH_OP_COND: BRANCH_OP_COND_T := OP_BRANCH_NE;
-
-    signal s_usage_mem: std_logic := '0';
-    signal s_usage_writeback: std_logic := '0';
-    signal s_pipe_is_pc_changer: std_logic := '0';
-    signal s_pipe_pc_changer_op: std_logic := '0';
-
-    signal s_mem_in_rs1_addr: std_logic_vector(4 downto 0) := (others => '0');
-    signal s_mem_out_rs1_value: std_logic_vector(31 downto 0);
-    signal s_mem_in_rs2_addr: std_logic_vector(4 downto 0) := (others => '0');
-    signal s_mem_out_rs2_value: std_logic_vector(31 downto 0);
-    signal s_mem_in_rd_addr: std_logic_vector(4 downto 0) := (others => '0');
-    signal s_mem_in_rd_value: std_logic_vector(31 downto 0);
-    signal s_mem_in_read_enable: std_logic := '0';
-    signal s_mem_in_write_enable: std_logic := '0';
-     
-   component RegisterFile is
+entity InstructionExecution is
     port(
         clock: in std_logic;
         reset: in std_logic;
-        addr_A: in std_logic_vector(4 downto 0);
-        addr_B: in std_logic_vector(4 downto 0);
-        read_enable: in std_logic;
-        addr_C: in std_logic_vector(4 downto 0);
-        write_C: in std_logic_vector(31 downto 0);
-        write_enable: in std_logic;
-        val_A: out std_logic_vector(31 downto 0);
-        val_B: out std_logic_vector(31 downto 0);
-        regs: out REG_MEMORY_T
+
+        next_pc: in std_logic_vector(31 downto 0);
+        rs1_addr: in std_logic_vector(4 downto 0);
+        rs1_value: in std_logic_vector(31 downto 0);
+        rs2_addr: in std_logic_vector(4 downto 0);
+        rs2_value: in std_logic_vector(31 downto 0);
+        rd_addr: in std_logic_vector(4 downto 0);
+        immediate: in std_logic_vector(31 downto 0);
+        instruction_class: in INST_CLASS_T;
+        ALU_OP: in ALU_OP_T;
+        MEM_OP: in MEM_OP_T;
+        MEM_OP_SIZE: in MEM_OP_SIZE_T;
+        OP_SIGN: in OP_SIGN_T;
+        usage_mem: in std_logic;
+        usage_writeback: in std_logic;
+
+        rs1_addr_out: out std_logic_vector(4 downto 0);
+        rs1_value_out: out std_logic_vector(31 downto 0);
+        rs2_addr_out: out std_logic_vector(4 downto 0);
+        rs2_value_out: out std_logic_vector(31 downto 0);
+        rd_addr_out: out std_logic_vector(4 downto 0);
+        rd_value_out: out std_logic_vector(31 downto 0);
+        reg_pc: out std_logic_vector(31 downto 0);
+        mem_addr_out: out std_logic_vector(31 downto 0);
+        MEM_OP_out: out MEM_OP_T;
+        MEM_OP_SIZE_out: out MEM_OP_SIZE_T;
+        OP_SIGN_out: out OP_SIGN_T;
+        usage_mem_out: out std_logic;
+        usage_writeback_out: out std_logic;
     );
-    end component;
+end entity InstructionExecution;
+
+architecture behaviour of InstructionExecution is
 begin
-    RegisterFileInstance: RegisterFile
-    port map(
-        clock => clock,
-        reset => reset,
-        addr_A => s_mem_in_rs1_addr,
-        addr_B => s_mem_in_rs2_addr,
-        read_enable => s_mem_in_read_enable,
-        addr_C => s_mem_in_rd_addr,
-        write_C => s_mem_in_rd_value,
-        write_enable => s_mem_in_write_enable,
-        val_A => s_mem_out_rs1_value,
-        val_B => s_mem_out_rs2_value,
-        regs => regs_dump
-    );
+    --  it needs to:
+    --      recognize and check for any branch/jump operations [DONE]
+    --      recognize and apply the ALU operation [DONE]
+    --      define the memory address to be used for load/store operations [DONE]
+    --      pass down the registers values [DONE]
 
-    decodeInstruction:process(curr_instruction)
-        variable v_opcode: std_logic_vector(6 downto 0);      
-        variable v_funct3: std_logic_vector(2 downto 0) := (others => '0');
-        variable v_funct7: std_logic_vector(6 downto 0) := (others => '0');
-        variable v_rd_addr: std_logic_vector(4 downto 0) := (others => '0');
-        variable v_rs1_addr: std_logic_vector(4 downto 0) := (others => '0');
-        variable v_rs2_addr: std_logic_vector(4 downto 0) := (others => '0');
+    synchronousExecutionLogic: process(clock, reset)
+        variable v_alu_result: std_logic_vector(31 downto 0);
+        variable v_rs1_signed_value: signed(31 downto 0);
+        variable v_rs1_unsigned_value: unsigned(31 downto 0);
+        variable v_rs2_signed_value: signed(31 downto 0);
+        variable v_rs2_unsigned_value: unsigned(31 downto 0);
         variable v_rd_value: std_logic_vector(31 downto 0);
-        variable v_immediate: std_logic_vector(31 downto 0);
-        variable v_immediate_12bits: std_logic_vector(11 downto 0);
-        variable v_immediate_13bits: std_logic_vector(12 downto 0);
-        variable v_immediate_21bits: std_logic_vector(20 downto 0);
-        
-        variable v_instruction_class: INST_CLASS_T := INST_CLASS_NOP;
-        variable v_ALU_OP: ALU_OP_T := OP_NOP;        -- OP_ADD, OP_SUB, ...  (use INST_CLASS=INST_CLASS_I to check addi, subi, ...)
-        variable v_MEM_OP: MEM_OP_T := OP_LOAD;        -- OP_LOAD, OP_STORE
-        variable v_MEM_OP_SIZE: MEM_OP_SIZE_T := OP_SIZE_WORD; -- OP_SIZE_BYTE, OP_SIZE_HALFWORD, OP_SIZE_WORD
-        variable v_OP_SIGN: OP_SIGN_T := OP_UNSIGNED;      -- OP_SIGNED, OP_UNSIGNED (to get lbu, lhu, sltu, ...)
-        variable v_BRANCH_OP_COND: BRANCH_OP_COND_T := OP_BRANCH_NE;
-        
-        variable v_pipe_is_pc_changer: std_logic := '0';
-    
-        variable v_usage_mem: std_logic := '0';
-        variable v_usage_writeback: std_logic := '0';
-    begin
-        -- it needs to:
-        --      recognize the instruction class [DONE]
-        --      assign the new aluop type [DONE]
-        --      set stages usage (mem_access, alu_usage, write_back) [DONE]
-        --      immediate mapping [DONE]
-        --      fetch rs1 and rs2 from memory [DONE]
-        --      write back rd value [DONE]
-        --      map output values [DONE]
-
-        v_rd_addr      := (others => '0');                          -- pre-map static values (same position in different instruction classes)
-        v_rs1_addr     := (others => '0');                          -- they are overwritten according to the instruction type
-        v_rs2_addr     := (others => '0');
-        v_funct3       := (others => '0');
-        v_funct7       := (others => '0');
-        v_immediate    := (others => '0');
-        
-        v_opcode := curr_instruction(6 downto 0);
-        v_instruction_class := INST_CLASS_ERR;
-        v_usage_writeback := '1';
-        v_usage_mem := '0';
-        v_OP_SIGN := OP_SIGNED;
-
-        case(v_opcode) is                       -- instruction class definition
-            when "0110011" =>
-                v_instruction_class := INST_CLASS_R;
-            when "0010011" | "0000011" | "1110011" | "1100111"=> 
-                v_instruction_class := INST_CLASS_I;
-            when "0100011" =>
-                v_instruction_class := INST_CLASS_S;
-            when "1100011" =>
-                v_instruction_class := INST_CLASS_B;
-            when "1101111" =>
-                v_instruction_class := INST_CLASS_J;
-            when "0110111" | "0010111" =>
-                v_instruction_class := INST_CLASS_U;
-            when others =>
-                v_instruction_class := INST_CLASS_ERR;
-        end case;
-        
-        case v_instruction_class is
-            when INST_CLASS_R =>
-                v_rd_addr  := curr_instruction(11 downto 7);
-                v_rs1_addr := curr_instruction(19 downto 15);
-                v_rs2_addr := curr_instruction(24 downto 20);
-                v_funct3   := curr_instruction(14 downto 12);
-                v_funct7   := curr_instruction(31 downto 25);
-        
-            when INST_CLASS_I =>
-                v_rd_addr  := curr_instruction(11 downto 7);
-                v_rs1_addr := curr_instruction(19 downto 15);
-                v_funct3   := curr_instruction(14 downto 12);
-        
-            when INST_CLASS_S =>
-                v_rs1_addr := curr_instruction(19 downto 15);
-                v_rs2_addr := curr_instruction(24 downto 20);
-                v_funct3   := curr_instruction(14 downto 12);
-        
-            when INST_CLASS_B =>
-                v_rs1_addr := curr_instruction(19 downto 15);
-                v_rs2_addr := curr_instruction(24 downto 20);
-                v_funct3   := curr_instruction(14 downto 12);
-        
-            when INST_CLASS_J =>
-                v_rd_addr := curr_instruction(11 downto 7);
-        
-            when INST_CLASS_U =>
-                v_rd_addr := curr_instruction(11 downto 7);
-        
-            when others =>
-                null;
-        end case;
-        
-        case(v_opcode) is                       -- instruction definition
-            when "0110011" | "0010011" =>
-                v_usage_mem := '0';
-                v_usage_writeback := '1';  
-                case(v_funct3) is
-                    when "000" =>
-                        if v_instruction_class = INST_CLASS_R then
-                            if v_funct7 = "0000000" then
-                                v_ALU_OP:= OP_ADD;
-                            elsif v_funct7 = "0010100" then
-                                v_ALU_OP:= OP_SUB;
-                            end if;
-                        elsif v_instruction_class = INST_CLASS_I then
-                            v_ALU_OP:= OP_ADD;
-                        end if;
-                    when "001" =>
-                        v_ALU_OP:= OP_SLL;
-                    when "010" =>
-                        v_ALU_OP:= OP_SLT;
-                    when "011" =>
-                        v_ALU_OP:= OP_SLT;
-                        v_OP_SIGN:= OP_UNSIGNED;
-                    when "100" =>
-                        v_ALU_OP:= OP_XOR;
-                    when "101" =>
-                        if v_instruction_class = INST_CLASS_R then
-                            if v_funct7 = "0000000" then
-                                v_ALU_OP:= OP_SRL;
-                            elsif v_funct7 = "0010100" then
-                                v_ALU_OP:= OP_SRA;
-                            end if;
-                        elsif v_instruction_class = INST_CLASS_I then
-                            if curr_instruction(31 downto 25) = "0000000" then  -- usage of immediate bits (11 downto 5) as funct7
-                                v_ALU_OP:= OP_SRL;
-                            elsif curr_instruction(31 downto 25) = "0010100" then
-                                v_ALU_OP:= OP_SRA;
-                            end if;
-                        end if;
-                    when "110" =>
-                        v_ALU_OP:= OP_OR;
-                    when "111" =>
-                        v_ALU_OP:= OP_AND;
-                    when others =>
-                        v_ALU_OP:= OP_ERR;
-                end case;
-        
-            when "0110111" =>
-                v_usage_mem := '0';
-                v_usage_writeback := '1';  
-                v_ALU_OP:= OP_LUI;
-
-            when "0010111" =>
-                v_usage_mem := '0';
-                v_usage_writeback := '1';  
-                v_ALU_OP:= OP_AUIPC;
-
-            when "0000011" => 
-                v_usage_mem := '1';
-                v_usage_writeback := '1';  
-                v_MEM_OP:= OP_LOAD;
-                v_ALU_OP:= OP_MEM;
-                case(v_funct3) is
-                    when "000" =>
-                        v_MEM_OP_SIZE:= OP_SIZE_BYTE;
-                    when "001" =>
-                        v_MEM_OP_SIZE:= OP_SIZE_HALFWORD;
-                    when "010" =>
-                        v_MEM_OP_SIZE:= OP_SIZE_WORD;
-                    when "100" =>
-                        v_MEM_OP_SIZE:= OP_SIZE_BYTE;
-                        v_OP_SIGN:= OP_UNSIGNED;
-                    when "101" =>
-                        v_MEM_OP_SIZE:= OP_SIZE_HALFWORD;
-                        v_OP_SIGN:= OP_UNSIGNED;
-                    when others =>
-                        v_MEM_OP_SIZE:= OP_SIZE_BYTE;
-                        v_OP_SIGN:= OP_UNSIGNED;
-                end case;
-        
-            when "0100011" =>
-                v_usage_mem := '1';
-                v_usage_writeback := '0';  
-                v_MEM_OP := OP_STORE;
-                v_ALU_OP:= OP_MEM;
-                case(v_funct3) is
-                    when "000" =>
-                        v_MEM_OP_SIZE:= OP_SIZE_BYTE;
-                    when "001" =>
-                        v_MEM_OP_SIZE:= OP_SIZE_HALFWORD;
-                    when "010" =>
-                        v_MEM_OP_SIZE:= OP_SIZE_WORD;
-                    when others =>
-                        v_MEM_OP := OP_LOAD;
-                        v_MEM_OP_SIZE:= OP_SIZE_BYTE;
-                end case;
-            
-            when "1100011" =>
-                v_usage_mem := '0';
-                v_usage_writeback := '0';
-                case(v_funct3) is
-                    when "000" =>
-                        v_BRANCH_OP_COND := OP_BRANCH_EQ;
-                    when "001" =>
-                        v_BRANCH_OP_COND := OP_BRANCH_NE;
-                    when "100" =>
-                        v_BRANCH_OP_COND := OP_BRANCH_LT;
-                    when "101" =>
-                        v_BRANCH_OP_COND := OP_BRANCH_GE;
-                    when "110" =>
-                        v_BRANCH_OP_COND := OP_BRANCH_LTU;
-                        v_OP_SIGN:= OP_UNSIGNED;
-                    when "111" =>
-                        v_BRANCH_OP_COND := OP_BRANCH_GEU;
-                        v_OP_SIGN:= OP_UNSIGNED;
-                    when others =>
-                        v_BRANCH_OP_COND := OP_BRANCH_NE;
-                end case;
-                    
-            when "1101111" | "1100111" => -- JAL (class INST_CLASS_J) | JALR (class INST_CLASS_I)
-                v_usage_mem := '0';
-                v_usage_writeback := '1';  
-                if v_instruction_class = INST_CLASS_J then
-                    v_ALU_OP:= OP_JAL;
-                elsif v_instruction_class = INST_CLASS_I then
-                    v_ALU_OP:= OP_JALR;
-                else
-                    v_ALU_OP:= OP_ERR;
-                end if;
-
-            when others =>
-                v_ALU_OP:= OP_ERR;
-        -- when "1110011" =>                                        -- INST_CLASS_I class but for OS/debug (not yet implemented)
-        --     case(v_funct3) is
-        --         when "000" =>
-        --             -- if imm = 0x0 -> ECALL
-        --             -- elif imm = 0x1 -> EBREAK
-        --     end case;
-        end case;
-
-
-        case(v_opcode) is                                           -- jumps and branches check for pipe flag
-            when "1100011" | "1101111" | "1100111" =>
-                v_pipe_is_pc_changer := '1';
-            when others =>
-                v_pipe_is_pc_changer := '0';
-        end case;
-
-        case(v_instruction_class) is                                -- immediate mapping
-            when INST_CLASS_R =>
-                null;                                               -- immediate not present in INST_CLASS_R instructions
-            
-            when INST_CLASS_I =>
-                case(v_OP_SIGN) is
-                    when OP_SIGNED =>
-                        v_immediate := std_logic_vector(resize(signed(curr_instruction(31 downto 20)), 32));
-                    when OP_UNSIGNED =>
-                        v_immediate := std_logic_vector(resize(unsigned(curr_instruction(31 downto 20)), 32));
-                end case;
-                    
-            when INST_CLASS_S =>
-                v_immediate_12bits := curr_instruction(31 downto 25) & curr_instruction(11 downto 7);
-                v_immediate := std_logic_vector(resize(signed(
-                    v_immediate_12bits    
-                ), 32));
-                    
-            when INST_CLASS_B =>
-                v_immediate_13bits := curr_instruction(31) &               -- imm[12]
-                                        curr_instruction(7) &              -- imm[11]
-                                        curr_instruction(30 downto 25) &   -- imm[10:5]
-                                        curr_instruction(11 downto 8) &    -- imm[4:1]
-                                        '0';                               -- imm[0]                     
-                v_immediate := std_logic_vector(resize(signed(
-                    v_immediate_12bits
-                ), 32));
-
-            when INST_CLASS_U =>
-                v_immediate := curr_instruction(31 downto 12) & x"000";
-                -- v_immediate := std_logic_vector(resize(
-                --     curr_instruction(31 downto 12) &   -- imm[31:12]
-                --     x"000"                             -- imm[11:0]
-                -- ), 32);
-
-            when INST_CLASS_J =>
-                v_immediate_21bits := curr_instruction(31) & -- imm[20]
-                    curr_instruction(19 downto 12) &        -- imm[19:12]
-                    curr_instruction(20) &                  -- imm[11]
-                    curr_instruction(30 downto 21) &        -- imm[10:1]
-                    '0';                                    -- imm[0]
-                v_immediate := std_logic_vector(resize(signed(
-                    v_immediate_21bits
-                ), 32));
-
-            when INST_CLASS_ERR =>
-                v_immediate := (others => '0');
-                v_usage_mem := '0';
-                v_usage_writeback := '0';
-                v_ALU_OP := OP_ERR;                                 -- signal the invalid instruction
-                v_MEM_OP := OP_LOAD;                                -- prevent unwanted store op due to errors
-            
-            when INST_CLASS_NOP =>
-                v_immediate := (others => '0');
-                v_usage_mem := '0';
-                v_usage_writeback := '0';
-                v_ALU_OP := OP_NOP;
-                v_MEM_OP := OP_LOAD;
-            
-            when others =>
-                null;
-        end case;
-        
-        case(v_instruction_class) is                                -- asynchronous/immediate registers fetch
-            when INST_CLASS_R | INST_CLASS_S | INST_CLASS_B =>
-                s_mem_in_rs1_addr <= v_rs1_addr;
-                s_mem_in_rs2_addr <= v_rs2_addr;
-                s_mem_in_read_enable <= '1';
-
-            when  INST_CLASS_I =>
-                s_mem_in_rs2_addr <= "00000";                       -- prevent unwanted readings
-                s_mem_in_rs1_addr <= v_rs1_addr;
-                s_mem_in_read_enable <= '1';
-
-            when INST_CLASS_U | INST_CLASS_J =>
-                s_mem_in_read_enable <= '0';
-
-            when INST_CLASS_NOP | INST_CLASS_ERR =>
-                s_mem_in_rs1_addr <= "00000";
-                s_mem_in_rs2_addr <= "00000";
-                s_mem_in_read_enable <= '0';
-            when others =>
-                null;
-        end case;
-
-        s_instruction_class <= v_instruction_class;                 -- variables to signals mapping
-        s_ALU_OP <= v_ALU_OP;
-        s_MEM_OP <= v_MEM_OP;
-        s_MEM_OP_SIZE <= v_MEM_OP_SIZE;
-        s_OP_SIGN <= v_OP_SIGN;
-        s_BRANCH_OP_COND <= v_BRANCH_OP_COND;
-        s_usage_mem <= v_usage_mem;
-        s_usage_writeback <= v_usage_writeback;
-        s_pipe_is_pc_changer <= v_pipe_is_pc_changer;
-        s_pipe_pc_changer_op <= v_pipe_is_pc_changer;
-        s_rs1_addr <= v_rs1_addr;
-        s_rs2_addr <= v_rs2_addr;
-        s_rd_addr <= v_rd_addr;
-        s_immediate <= v_immediate;
-
-    end process;
-
-    writeBackValue:process(pipe_writeback_enable, pipe_writeback_addr, pipe_writeback_value) is
-    begin
-        if pipe_writeback_enable = '1' then
-            s_mem_in_rd_addr <= pipe_writeback_addr;
-            s_mem_in_rd_value <= pipe_writeback_value;
-            s_mem_in_write_enable <= '1';
-        else
-            s_mem_in_rd_addr <= "00000";
-            s_mem_in_write_enable <= '0';
-        end if;
-    end process;
-
-    pipelineRegisters: process(clock, reset)
+        variable v_shift_amount: integer range 0 to 31;
+        variable v_immediate_signed: signed(31 downto 0);
+        variable v_immediate_unsigned: unsigned(31 downto 0);
     begin
         if reset = '1' then
-            rs1_addr <= (others => '0');
-            rs1_value <= (others => '0');
-            rs2_addr <= (others => '0');
-            rs2_value <= (others => '0');
-            rd_addr <= (others => '0');
-            immediate <= (others => '0');
-            instruction_class <= INST_CLASS_NOP;
-            ALU_OP <= OP_NOP;
-            MEM_OP <= OP_LOAD;
-            MEM_OP_SIZE <= OP_SIZE_WORD;
-            OP_SIGN <= OP_UNSIGNED;
-            BRANCH_OP_COND <= OP_BRANCH_NE;
-            usage_mem <= '0';
-            usage_writeback <= '0';
-            pipe_is_pc_changer <= '0';
-            pipe_pc_changer_op <= '0';
-            reg_pc <= (others => '0');
+            rs1_addr_out <= (others => '0');
+            rs1_value_out <= (others => '0');
+            rs2_addr_out <= (others => '0');
+            rs2_value_out <= (others => '0');
+            rd_addr_out <= (others => '0');
+            v_rd_value := (others => '0');
+            v_alu_result := (others => '0');
+            mem_addr_out <= (others => '0');
+            MEM_OP_out <= OP_LOAD;
+            MEM_OP_SIZE_out <= OP_SIZE_WORD;
+            OP_SIGN_out <= OP_UNSIGNED;
+            usage_mem_out <= '0';
+            usage_writeback_out <= '0';
         elsif rising_edge(clock) then
-            instruction_class <= s_instruction_class;
-            ALU_OP <= s_ALU_OP;
-            MEM_OP <= s_MEM_OP;
-            MEM_OP_SIZE <= s_MEM_OP_SIZE;
-            OP_SIGN <= s_OP_SIGN;
-            BRANCH_OP_COND <= s_BRANCH_OP_COND;
-            usage_mem <= s_usage_mem;
-            usage_writeback <= s_usage_writeback;
-            pipe_is_pc_changer <= s_pipe_is_pc_changer;
-            pipe_pc_changer_op <= s_pipe_pc_changer_op;
-            rs1_addr <= s_rs1_addr;
-            rs2_addr <= s_rs2_addr;
-            rs1_value <= s_mem_out_rs1_value;
-            rs2_value <= s_mem_out_rs2_value;
-            rd_addr <= s_rd_addr;
-            immediate <= s_immediate;
-            reg_pc <= next_pc;
+            rs1_addr_out <= rs1_addr;
+            rs1_value_out <= rs1_value;
+            rs2_addr_out <= rs2_addr;
+            rs2_value_out <= rs2_value;
+            rd_addr_out <= rd_addr;
+            usage_mem_out <= usage_mem;
+            MEM_OP_out <= MEM_OP;
+            MEM_OP_SIZE_out <= MEM_OP_SIZE;
+            OP_SIGN_out <= OP_SIGN;
+            usage_writeback_out <= usage_writeback;
+
+            v_rs1_signed_value := signed(rs1_value);
+            v_rs1_unsigned_value := unsigned(rs1_value);
+            v_rs2_signed_value := signed(rs2_value);
+            v_rs2_unsigned_value := unsigned(rs2_value);
+            v_immediate_signed := signed(immediate);
+            v_immediate_unsigned := unsigned(immediate);
+
+            if instruction_class = INST_CLASS_I or instruction_class = INST_CLASS_U then
+                v_rs2_signed_value := v_immediate_signed;
+                v_rs2_unsigned_value := v_immediate_unsigned;
+            end if;
+            
+            v_shift_amount := to_integer(v_rs2_unsigned_value(4 downto 0));
+                            
+            case ALU_OP is
+                when OP_ADD =>
+                    case OP_SIGN is
+                        when OP_SIGNED =>
+                            v_alu_result := std_logic_vector(v_rs1_signed_value + v_rs2_signed_value);
+                        when others =>
+                            v_alu_result := std_logic_vector(v_rs1_unsigned_value + v_rs2_unsigned_value);
+                    end case;
+                when OP_SUB => 
+                    case OP_SIGN is
+                        when OP_SIGNED =>
+                            v_alu_result := std_logic_vector(v_rs1_signed_value - v_rs2_signed_value);
+                        when others =>
+                            v_alu_result := std_logic_vector(v_rs1_unsigned_value - v_rs2_unsigned_value);
+                    end case;
+                when OP_AND => 
+                    v_alu_result := std_logic_vector(v_rs1_unsigned_value and v_rs2_unsigned_value);
+                when OP_OR => 
+                    v_alu_result := std_logic_vector(v_rs1_unsigned_value or v_rs2_unsigned_value);
+                when OP_XOR => 
+                    v_alu_result := std_logic_vector(v_rs1_unsigned_value xor v_rs2_unsigned_value);
+                when OP_SLL => 
+                    v_alu_result := std_logic_vector(v_rs1_unsigned_value sll v_shift_amount);
+                when OP_SRL => 
+                    v_alu_result := std_logic_vector(v_rs1_unsigned_value srl v_shift_amount);
+                when OP_SRA => 
+                    v_alu_result := std_logic_vector(v_rs1_signed_value sra v_shift_amount);
+                when OP_SLT =>
+                    case OP_SIGN is
+                        when OP_SIGNED =>
+                            if (v_rs1_signed_value < v_rs2_signed_value) then
+                                v_alu_result := x"00000001";
+                            else
+                                v_alu_result := (others => '0');
+                            end if;                                
+                        when others =>
+                            if (v_rs1_unsigned_value < v_rs2_unsigned_value) then
+                                v_alu_result := x"00000001";
+                            else
+                                v_alu_result := (others => '0');
+                            end if;
+                    end case;
+                when OP_LUI => 
+                    v_alu_result := std_logic_vector((v_rs2_unsigned_value sll 12));
+                when OP_AUIPC => 
+                    v_alu_result := AdderFunction(UNSIGNED_UNSIGNED, next_pc, std_logic_vector(rs2_value sll 12));
+                when OP_MEM =>
+                    v_alu_result := AdderFunction(UNSIGNED_SIGNED, std_logic_vector(v_rs1_unsigned_value), std_logic_vector(v_immediate_signed));
+                    mem_addr_out <= v_alu_result;
+                when OP_JAL | OP_JALR =>
+                    -- store the next_pc in rd
+                    v_alu_result := next_pc;
+                when OP_BR =>
+                    null;
+                when OP_NOP =>
+                    null;
+                when others => 
+                    v_alu_result := (others => '0');
+            end case;
+            v_rd_value := v_alu_result;
+
         end if;
+        reg_pc <= next_pc;
+        rd_value_out <= v_rd_value;
     end process;
-end behaviour ;
+
+end behaviour;

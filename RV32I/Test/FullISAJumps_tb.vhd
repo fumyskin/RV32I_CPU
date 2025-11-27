@@ -14,13 +14,17 @@ architecture behaviour of FullISAJumps_tb is
 
     signal clock: std_logic := '0';
     signal reset: std_logic := '1';
+
+    signal s_tb_branch_misprediction: std_logic;
+    signal s_tb_branch_offset: std_logic_vector(31 downto 0);
+    signal s_tb_jump_jalr_pc: std_logic_vector(31 downto 0);
+    signal s_tb_branch_prediction: std_logic;
+    signal s_tb_curr_instruction: std_logic_vector(31 downto 0);
+    signal s_tb_jump_jalr_value: std_logic_vector(31 downto 0);
     
     signal s_tb_next_pc_1: std_logic_vector(31 downto 0) := (others => '0');
     signal s_tb_next_pc_2: std_logic_vector(31 downto 0) := (others => '0');
     signal s_tb_next_pc_3: std_logic_vector(31 downto 0) := (others => '0');
-    signal s_tb_curr_instruction: std_logic_vector(31 downto 0);
-    signal s_tb_async_branch_not_taken: std_logic := '0';
-    signal s_tb_is_pc_changer: std_logic := '0';
 
     signal s_tb_rs1_addr: std_logic_vector(4 downto 0) := (others => '0');
     signal s_tb_rs1_value: std_logic_vector(31 downto 0);
@@ -37,8 +41,6 @@ architecture behaviour of FullISAJumps_tb is
     signal s_tb_usage_mem: std_logic;
     signal s_tb_usage_writeback: std_logic;
     signal s_tb_regs_dump: REG_MEMORY_T;
-    signal s_tb_pipe_is_pc_changer: std_logic;
-    signal s_tb_pipe_pc_changer_op: std_logic;
 
     signal s_tb_ieout_rs1_addr_out: std_logic_vector(4 downto 0);
     signal s_tb_ieout_rs1_value_out: std_logic_vector(31 downto 0);
@@ -52,10 +54,6 @@ architecture behaviour of FullISAJumps_tb is
     signal s_tb_ieout_OP_SIGN_out: OP_SIGN_T;
     signal s_tb_ieout_usage_mem_out: std_logic;
     signal s_tb_ieout_usage_writeback_out: std_logic;
-
-    signal s_tb_pipe_pc_changer_done: std_logic;
-    signal s_tb_pipe_new_pc: std_logic_vector(31 downto 0);
-    signal s_tb_pipe_use_new_pc: std_logic;
 
     signal s_tb_memout_pipe_writeback_enable_out: std_logic;
     signal s_tb_memout_pipe_writeback_addr_out: std_logic_vector(4 downto 0);
@@ -81,11 +79,11 @@ begin
         clock => clock,
         reset => reset,
         enable_fetch => '1',
-        is_pc_changer => s_tb_pipe_is_pc_changer,
-        pipe_pc_changer_done => s_tb_pipe_pc_changer_done,
-        pipe_use_new_pc => s_tb_pipe_use_new_pc,
-        pipe_new_pc => s_tb_pipe_new_pc,
-        curr_instruction => s_tb_curr_instruction,
+        branch_misprediction => s_tb_branch_misprediction,
+        branch_offset => s_tb_branch_offset, 
+        jump_jalr_pc => s_tb_jump_jalr_pc, 
+        branch_prediction => s_tb_branch_prediction, 
+        curr_instruction => s_tb_curr_instruction, 
         reg_pc => s_tb_next_pc_1
     );
 
@@ -93,8 +91,10 @@ begin
     port map(
         clock => clock,
         reset => reset,
+        
         curr_instruction => s_tb_curr_instruction,
         next_pc => s_tb_next_pc_1,
+        branch_prediction => s_tb_branch_prediction,
         pipe_writeback_enable => s_tb_memout_pipe_writeback_enable_out,
         pipe_writeback_addr => s_tb_memout_pipe_writeback_addr_out,
         pipe_writeback_value => s_tb_memout_pipe_writeback_value_out,
@@ -109,11 +109,11 @@ begin
         MEM_OP => s_tb_MEM_OP,
         MEM_OP_SIZE => s_tb_MEM_OP_SIZE,
         OP_SIGN => s_tb_OP_SIGN,
-        BRANCH_OP_COND => s_tb_BRANCH_OP_COND,
+        jump_jalr_value => s_tb_jump_jalr_value,
+        branch_misprediction => s_tb_branch_misprediction,
+        branch_offset => s_tb_branch_offset,
         usage_mem => s_tb_usage_mem,
         usage_writeback => s_tb_usage_writeback,
-        pipe_is_pc_changer => s_tb_pipe_is_pc_changer,
-        pipe_pc_changer_op => s_tb_pipe_pc_changer_op,
         reg_pc => s_tb_next_pc_2,
         regs_dump => s_tb_regs_dump
     );
@@ -135,11 +135,8 @@ begin
         MEM_OP => s_tb_MEM_OP,
         MEM_OP_SIZE => s_tb_MEM_OP_SIZE,
         OP_SIGN => s_tb_OP_SIGN,
-        BRANCH_OP_COND => s_tb_BRANCH_OP_COND,
         usage_mem => s_tb_usage_mem,
         usage_writeback => s_tb_usage_writeback,
-        pipe_pc_changer => s_tb_pipe_pc_changer_op,
-
         rs1_addr_out => s_tb_ieout_rs1_addr_out,
         rs1_value_out => s_tb_ieout_rs1_value_out,
         rs2_addr_out => s_tb_ieout_rs2_addr_out,
@@ -153,9 +150,6 @@ begin
         OP_SIGN_out => s_tb_ieout_OP_SIGN_out,
         usage_mem_out => s_tb_ieout_usage_mem_out,
         usage_writeback_out => s_tb_ieout_usage_writeback_out,
-        pipe_pc_changer_done => s_tb_pipe_pc_changer_done,
-        pipe_use_new_pc => s_tb_pipe_use_new_pc,
-        pipe_new_pc => s_tb_pipe_new_pc
     );
 
     memoryAccessEntity: entity work.MemoryAccess

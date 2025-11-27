@@ -21,10 +21,8 @@ entity InstructionExecution is
         MEM_OP: in MEM_OP_T;
         MEM_OP_SIZE: in MEM_OP_SIZE_T;
         OP_SIGN: in OP_SIGN_T;
-        BRANCH_OP_COND: in BRANCH_OP_COND_T;
         usage_mem: in std_logic;
         usage_writeback: in std_logic;
-        pipe_pc_changer: in std_logic;
 
         rs1_addr_out: out std_logic_vector(4 downto 0);
         rs1_value_out: out std_logic_vector(31 downto 0);
@@ -39,10 +37,6 @@ entity InstructionExecution is
         OP_SIGN_out: out OP_SIGN_T;
         usage_mem_out: out std_logic;
         usage_writeback_out: out std_logic;
-
-        pipe_pc_changer_done: out std_logic;
-        pipe_use_new_pc: out std_logic;
-        pipe_new_pc: out std_logic_vector(31 downto 0)
     );
 end entity InstructionExecution;
 
@@ -61,14 +55,9 @@ begin
         variable v_rs2_signed_value: signed(31 downto 0);
         variable v_rs2_unsigned_value: unsigned(31 downto 0);
         variable v_rd_value: std_logic_vector(31 downto 0);
-        variable v_branch_taken: std_logic;
         variable v_shift_amount: integer range 0 to 31;
         variable v_immediate_signed: signed(31 downto 0);
         variable v_immediate_unsigned: unsigned(31 downto 0);
-        variable v_next_pc_unsigned: unsigned(31 downto 0);
-        variable v_pipe_new_pc: std_logic_vector(31 downto 0);
-        variable v_pipe_use_new_pc: std_logic;
-        variable v_pipe_pc_changer_done: std_logic;
     begin
         if reset = '1' then
             rs1_addr_out <= (others => '0');
@@ -84,12 +73,6 @@ begin
             OP_SIGN_out <= OP_UNSIGNED;
             usage_mem_out <= '0';
             usage_writeback_out <= '0';
-            v_pipe_new_pc := (others => '0');
-            v_pipe_use_new_pc := '0';
-            v_pipe_pc_changer_done := '0';
-            pipe_pc_changer_done <= '0';
-            pipe_use_new_pc <= '0';
-            pipe_new_pc <= (others => '0');
         elsif rising_edge(clock) then
             rs1_addr_out <= rs1_addr;
             rs1_value_out <= rs1_value;
@@ -108,7 +91,6 @@ begin
             v_rs2_unsigned_value := unsigned(rs2_value);
             v_immediate_signed := signed(immediate);
             v_immediate_unsigned := unsigned(immediate);
-            v_next_pc_unsigned := unsigned(next_pc);
 
             if instruction_class = INST_CLASS_I or instruction_class = INST_CLASS_U then
                 v_rs2_signed_value := v_immediate_signed;
@@ -166,58 +148,19 @@ begin
                 when OP_MEM =>
                     v_alu_result := AdderFunction(UNSIGNED_SIGNED, std_logic_vector(v_rs1_unsigned_value), std_logic_vector(v_immediate_signed));
                     mem_addr_out <= v_alu_result;
+                when OP_JAL | OP_JALR =>
+                    -- store the next_pc in rd
+                    v_alu_result := next_pc;
+                when OP_BR =>
+                    null;
+                when OP_NOP =>
+                    null;
                 when others => 
                     v_alu_result := (others => '0');
             end case;
             v_rd_value := v_alu_result;
-            v_pipe_use_new_pc := '0';
-            v_pipe_pc_changer_done := '0';
-            if pipe_pc_changer = '1' then
-                case ALU_OP is
-                    when OP_JAL =>
-                        v_pipe_use_new_pc := '1';
-                        v_pipe_new_pc := AdderFunction(UNSIGNED_SIGNED, next_pc, immediate);
-                        v_rd_value := next_pc;
-                    when OP_JALR =>
-                        v_pipe_use_new_pc := '1';
-                        v_pipe_new_pc := AdderFunction(UNSIGNED_SIGNED, rs1_value, immediate);
-                        v_pipe_new_pc(0) := '0';
-                        v_rd_value := next_pc;
-                    when others =>
-                        v_branch_taken := '0';
-                        if ALU_OP /= OP_ERR and ALU_OP /= OP_NOP then
-                            case BRANCH_OP_COND is
-                                when OP_BRANCH_EQ => 
-                                    v_branch_taken := '1' when rs1_value = rs2_value else '0';
-                                when OP_BRANCH_NE => 
-                                    v_branch_taken := '1' when rs1_value /= rs2_value else '0';
-                                when OP_BRANCH_LT => 
-                                    v_branch_taken := '1' when v_rs1_signed_value < v_rs2_signed_value else '0';
-                                when OP_BRANCH_GE => 
-                                    v_branch_taken := '1' when v_rs1_signed_value >= v_rs2_signed_value else '0';
-                                when OP_BRANCH_LTU => 
-                                    v_branch_taken := '1' when v_rs1_unsigned_value < v_rs2_unsigned_value else '0';
-                                when OP_BRANCH_GEU => 
-                                    v_branch_taken := '1' when v_rs1_unsigned_value >= v_rs2_unsigned_value else '0';
-                                when others => 
-                                    v_branch_taken := '0';
-                            end case;
-                        end if;
-                        if v_branch_taken = '1' then
-                            v_pipe_use_new_pc := '1';
-                            v_pipe_new_pc := AdderFunction(UNSIGNED_SIGNED, next_pc, immediate);
-                        end if;
-                end case;
-                v_pipe_pc_changer_done := '1';
-            else
-                v_pipe_new_pc := (others => '0');
-                v_pipe_use_new_pc := '0';
-                v_pipe_pc_changer_done := '0';
-            end if;
+
         end if;
-        pipe_pc_changer_done <= v_pipe_pc_changer_done;
-        pipe_new_pc <= v_pipe_new_pc;
-        pipe_use_new_pc <= v_pipe_use_new_pc;
         reg_pc <= next_pc;
         rd_value_out <= v_rd_value;
     end process;

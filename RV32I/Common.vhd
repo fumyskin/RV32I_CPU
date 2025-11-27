@@ -20,6 +20,7 @@ package common is
         OP_SLT,
         OP_LUI,
         OP_AUIPC,
+        OP_BR,
         OP_JAL,
         OP_JALR,
         OP_MEM,
