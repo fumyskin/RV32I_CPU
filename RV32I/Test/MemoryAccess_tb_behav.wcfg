@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="FullISAJumps_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="FullISAJumps_tb" />
+            <top_module name="common" />
+            <top_module name="numeric_std" />
+            <top_module name="standard" />
+            <top_module name="std_logic_1164" />
+            <top_module name="textio" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="1,124.589 ns"></ZoomEndTime>
+      <Cursor1Time time="500.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="286"></NameColumnWidth>
+      <ValueColumnWidth column_width="105"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="48" />
+   <wvobject fp_name="/FullISAJumps_tb/RV32I_OPERATION" type="array">
+      <obj_property name="ElementShortName">RV32I_OPERATION[1:22]</obj_property>
+      <obj_property name="ObjectShortName">RV32I_OPERATION[1:22]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/clock" type="logic">
+      <obj_property name="ElementShortName">clock</obj_property>
+      <obj_property name="ObjectShortName">clock</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/reset" type="logic">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_curr_pc" type="array">
+      <obj_property name="ElementShortName">s_tb_curr_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_curr_pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_curr_instruction" type="array">
+      <obj_property name="ElementShortName">s_tb_curr_instruction[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_curr_instruction[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_next_pc" type="array">
+      <obj_property name="ElementShortName">s_tb_next_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_next_pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_rs1_addr" type="array">
+      <obj_property name="ElementShortName">s_tb_rs1_addr[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_rs1_addr[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_rs1_value" type="array">
+      <obj_property name="ElementShortName">s_tb_rs1_value[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_rs1_value[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_rs2_addr" type="array">
+      <obj_property name="ElementShortName">s_tb_rs2_addr[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_rs2_addr[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_rs2_value" type="array">
+      <obj_property name="ElementShortName">s_tb_rs2_value[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_rs2_value[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_rd_addr" type="array">
+      <obj_property name="ElementShortName">s_tb_rd_addr[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_rd_addr[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_immediate" type="array">
+      <obj_property name="ElementShortName">s_tb_immediate[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_immediate[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_instruction_class" type="other">
+      <obj_property name="ElementShortName">s_tb_instruction_class</obj_property>
+      <obj_property name="ObjectShortName">s_tb_instruction_class</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ALU_OP" type="other">
+      <obj_property name="ElementShortName">s_tb_ALU_OP</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ALU_OP</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_MEM_OP" type="other">
+      <obj_property name="ElementShortName">s_tb_MEM_OP</obj_property>
+      <obj_property name="ObjectShortName">s_tb_MEM_OP</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_MEM_OP_SIZE" type="other">
+      <obj_property name="ElementShortName">s_tb_MEM_OP_SIZE</obj_property>
+      <obj_property name="ObjectShortName">s_tb_MEM_OP_SIZE</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_OP_SIGN" type="other">
+      <obj_property name="ElementShortName">s_tb_OP_SIGN</obj_property>
+      <obj_property name="ObjectShortName">s_tb_OP_SIGN</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_BRANCH_OP_COND" type="other">
+      <obj_property name="ElementShortName">s_tb_BRANCH_OP_COND</obj_property>
+      <obj_property name="ObjectShortName">s_tb_BRANCH_OP_COND</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_usage_jump" type="logic">
+      <obj_property name="ElementShortName">s_tb_usage_jump</obj_property>
+      <obj_property name="ObjectShortName">s_tb_usage_jump</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_usage_alu" type="logic">
+      <obj_property name="ElementShortName">s_tb_usage_alu</obj_property>
+      <obj_property name="ObjectShortName">s_tb_usage_alu</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_usage_mem" type="logic">
+      <obj_property name="ElementShortName">s_tb_usage_mem</obj_property>
+      <obj_property name="ObjectShortName">s_tb_usage_mem</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_usage_writeback" type="logic">
+      <obj_property name="ElementShortName">s_tb_usage_writeback</obj_property>
+      <obj_property name="ObjectShortName">s_tb_usage_writeback</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_pipe_pc_changer" type="logic">
+      <obj_property name="ElementShortName">s_tb_pipe_pc_changer</obj_property>
+      <obj_property name="ObjectShortName">s_tb_pipe_pc_changer</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_reg_pc" type="array">
+      <obj_property name="ElementShortName">s_tb_reg_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_reg_pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_regs_dump" type="array">
+      <obj_property name="ElementShortName">s_tb_regs_dump[0:31][31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_regs_dump[0:31][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_rs1_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_rs1_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_rs1_addr_out[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_rs1_value_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_rs1_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_rs1_value_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_rs2_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_rs2_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_rs2_addr_out[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_rs2_value_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_rs2_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_rs2_value_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_rd_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_rd_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_rd_addr_out[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_rd_value_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_rd_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_rd_value_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_mem_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_mem_addr_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_mem_addr_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_MEM_OP_out" type="other">
+      <obj_property name="ElementShortName">s_tb_ieout_MEM_OP_out</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_MEM_OP_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_MEM_OP_SIZE_out" type="other">
+      <obj_property name="ElementShortName">s_tb_ieout_MEM_OP_SIZE_out</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_MEM_OP_SIZE_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_OP_SIGN_out" type="other">
+      <obj_property name="ElementShortName">s_tb_ieout_OP_SIGN_out</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_OP_SIGN_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_usage_mem_out" type="logic">
+      <obj_property name="ElementShortName">s_tb_ieout_usage_mem_out</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_usage_mem_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_usage_writeback_out" type="logic">
+      <obj_property name="ElementShortName">s_tb_ieout_usage_writeback_out</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_usage_writeback_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_pipe_use_new_pc" type="logic">
+      <obj_property name="ElementShortName">s_tb_ieout_pipe_use_new_pc</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_pipe_use_new_pc</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_pipe_new_pc" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_pipe_new_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_pipe_new_pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_pipe_writeback_enable_out" type="logic">
+      <obj_property name="ElementShortName">s_tb_memout_pipe_writeback_enable_out</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_pipe_writeback_enable_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_pipe_writeback_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_memout_pipe_writeback_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_pipe_writeback_addr_out[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_pipe_writeback_value_out" type="array">
+      <obj_property name="ElementShortName">s_tb_memout_pipe_writeback_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_pipe_writeback_value_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_rs1_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_memout_rs1_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_rs1_addr_out[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_rs1_value_out" type="array">
+      <obj_property name="ElementShortName">s_tb_memout_rs1_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_rs1_value_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_rs2_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_memout_rs2_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_rs2_addr_out[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_rs2_value_out" type="array">
+      <obj_property name="ElementShortName">s_tb_memout_rs2_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_rs2_value_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/CLOCK_PERIOD" type="other">
+      <obj_property name="ElementShortName">CLOCK_PERIOD</obj_property>
+      <obj_property name="ObjectShortName">CLOCK_PERIOD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/TEST_CYCLES" type="other">
+      <obj_property name="ElementShortName">TEST_CYCLES</obj_property>
+      <obj_property name="ObjectShortName">TEST_CYCLES</obj_property>
+   </wvobject>
+</wave_config>

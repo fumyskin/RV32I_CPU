@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="FullISAJumps_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="FullISAJumps_tb" />
+            <top_module name="common" />
+            <top_module name="numeric_std" />
+            <top_module name="standard" />
+            <top_module name="std_logic_1164" />
+            <top_module name="textio" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="787.536 ns"></ZoomEndTime>
+      <Cursor1Time time="393.768 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="321"></NameColumnWidth>
+      <ValueColumnWidth column_width="68"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="77" />
+   <wvobject fp_name="/FullISAJumps_tb/clock" type="logic">
+      <obj_property name="ElementShortName">clock</obj_property>
+      <obj_property name="ObjectShortName">clock</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/reset" type="logic">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/InstructionFetcherEntity/enable_fetch" type="logic">
+      <obj_property name="ElementShortName">enable_fetch</obj_property>
+      <obj_property name="ObjectShortName">enable_fetch</obj_property>
+      <obj_property name="CustomSignalColor">#A0A0A4</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/InstructionFetcherEntity/curr_instruction" type="array">
+      <obj_property name="ElementShortName">curr_instruction[31:0]</obj_property>
+      <obj_property name="ObjectShortName">curr_instruction[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#A0A0A4</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/InstructionFetcherEntity/reg_pc" type="array">
+      <obj_property name="ElementShortName">reg_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">reg_pc[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#A0A0A4</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/InstructionFetcherEntity/s_mem_addr" type="array">
+      <obj_property name="ElementShortName">s_mem_addr[10:0]</obj_property>
+      <obj_property name="ObjectShortName">s_mem_addr[10:0]</obj_property>
+      <obj_property name="CustomSignalColor">#A0A0A4</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/InstructionFetcherEntity/s_curr_instruction" type="array">
+      <obj_property name="ElementShortName">s_curr_instruction[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_curr_instruction[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#A0A0A4</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/InstructionFetcherEntity/s_pc" type="array">
+      <obj_property name="ElementShortName">s_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_pc[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#A0A0A4</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/InstructionFetcherEntity/s_mem_addr" type="array">
+      <obj_property name="ElementShortName">s_mem_addr[10:0]</obj_property>
+      <obj_property name="ObjectShortName">s_mem_addr[10:0]</obj_property>
+      <obj_property name="CustomSignalColor">#A0A0A4</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/InstructionFetcherEntity/s_curr_instruction" type="array">
+      <obj_property name="ElementShortName">s_curr_instruction[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_curr_instruction[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#A0A0A4</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/InstructionFetcherEntity/s_pc" type="array">
+      <obj_property name="ElementShortName">s_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_pc[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#A0A0A4</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_next_pc_1" type="array">
+      <obj_property name="ElementShortName">s_tb_next_pc_1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_next_pc_1[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_next_pc_2" type="array">
+      <obj_property name="ElementShortName">s_tb_next_pc_2[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_next_pc_2[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FF0080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_next_pc_3" type="array">
+      <obj_property name="ElementShortName">s_tb_next_pc_3[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_next_pc_3[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_curr_instruction" type="array">
+      <obj_property name="ElementShortName">s_tb_curr_instruction[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_curr_instruction[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_rs1_addr" type="array">
+      <obj_property name="ElementShortName">s_tb_rs1_addr[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_rs1_addr[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_rs1_value" type="array">
+      <obj_property name="ElementShortName">s_tb_rs1_value[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_rs1_value[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_rs2_addr" type="array">
+      <obj_property name="ElementShortName">s_tb_rs2_addr[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_rs2_addr[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_rs2_value" type="array">
+      <obj_property name="ElementShortName">s_tb_rs2_value[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_rs2_value[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_rd_addr" type="array">
+      <obj_property name="ElementShortName">s_tb_rd_addr[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_rd_addr[4:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFD700</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_immediate" type="array">
+      <obj_property name="ElementShortName">s_tb_immediate[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_immediate[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_instruction_class" type="other">
+      <obj_property name="ElementShortName">s_tb_instruction_class</obj_property>
+      <obj_property name="ObjectShortName">s_tb_instruction_class</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ALU_OP" type="other">
+      <obj_property name="ElementShortName">s_tb_ALU_OP</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ALU_OP</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_MEM_OP" type="other">
+      <obj_property name="ElementShortName">s_tb_MEM_OP</obj_property>
+      <obj_property name="ObjectShortName">s_tb_MEM_OP</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_MEM_OP_SIZE" type="other">
+      <obj_property name="ElementShortName">s_tb_MEM_OP_SIZE</obj_property>
+      <obj_property name="ObjectShortName">s_tb_MEM_OP_SIZE</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_OP_SIGN" type="other">
+      <obj_property name="ElementShortName">s_tb_OP_SIGN</obj_property>
+      <obj_property name="ObjectShortName">s_tb_OP_SIGN</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_BRANCH_OP_COND" type="other">
+      <obj_property name="ElementShortName">s_tb_BRANCH_OP_COND</obj_property>
+      <obj_property name="ObjectShortName">s_tb_BRANCH_OP_COND</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_usage_mem" type="logic">
+      <obj_property name="ElementShortName">s_tb_usage_mem</obj_property>
+      <obj_property name="ObjectShortName">s_tb_usage_mem</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_usage_writeback" type="logic">
+      <obj_property name="ElementShortName">s_tb_usage_writeback</obj_property>
+      <obj_property name="ObjectShortName">s_tb_usage_writeback</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_regs_dump" type="array">
+      <obj_property name="ElementShortName">s_tb_regs_dump[0:31][31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_regs_dump[0:31][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/next_pc" type="array">
+      <obj_property name="ElementShortName">next_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">next_pc[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/rs1_addr" type="array">
+      <obj_property name="ElementShortName">rs1_addr[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rs1_addr[4:0]</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/rs1_value" type="array">
+      <obj_property name="ElementShortName">rs1_value[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rs1_value[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/rs2_addr" type="array">
+      <obj_property name="ElementShortName">rs2_addr[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rs2_addr[4:0]</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/rs2_value" type="array">
+      <obj_property name="ElementShortName">rs2_value[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rs2_value[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/rd_addr" type="array">
+      <obj_property name="ElementShortName">rd_addr[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rd_addr[4:0]</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/immediate" type="array">
+      <obj_property name="ElementShortName">immediate[31:0]</obj_property>
+      <obj_property name="ObjectShortName">immediate[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/instruction_class" type="other">
+      <obj_property name="ElementShortName">instruction_class</obj_property>
+      <obj_property name="ObjectShortName">instruction_class</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/ALU_OP" type="other">
+      <obj_property name="ElementShortName">ALU_OP</obj_property>
+      <obj_property name="ObjectShortName">ALU_OP</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/MEM_OP" type="other">
+      <obj_property name="ElementShortName">MEM_OP</obj_property>
+      <obj_property name="ObjectShortName">MEM_OP</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/MEM_OP_SIZE" type="other">
+      <obj_property name="ElementShortName">MEM_OP_SIZE</obj_property>
+      <obj_property name="ObjectShortName">MEM_OP_SIZE</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/OP_SIGN" type="other">
+      <obj_property name="ElementShortName">OP_SIGN</obj_property>
+      <obj_property name="ObjectShortName">OP_SIGN</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/usage_mem" type="logic">
+      <obj_property name="ElementShortName">usage_mem</obj_property>
+      <obj_property name="ObjectShortName">usage_mem</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/usage_writeback" type="logic">
+      <obj_property name="ElementShortName">usage_writeback</obj_property>
+      <obj_property name="ObjectShortName">usage_writeback</obj_property>
+      <obj_property name="CustomSignalColor">#008080</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/rs1_addr_out" type="array">
+      <obj_property name="ElementShortName">rs1_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rs1_addr_out[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/rs1_value_out" type="array">
+      <obj_property name="ElementShortName">rs1_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rs1_value_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/rs2_addr_out" type="array">
+      <obj_property name="ElementShortName">rs2_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rs2_addr_out[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/rs2_value_out" type="array">
+      <obj_property name="ElementShortName">rs2_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rs2_value_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/rd_addr_out" type="array">
+      <obj_property name="ElementShortName">rd_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rd_addr_out[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/rd_value_out" type="array">
+      <obj_property name="ElementShortName">rd_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rd_value_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/reg_pc" type="array">
+      <obj_property name="ElementShortName">reg_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">reg_pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/mem_addr_out" type="array">
+      <obj_property name="ElementShortName">mem_addr_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">mem_addr_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/MEM_OP_out" type="other">
+      <obj_property name="ElementShortName">MEM_OP_out</obj_property>
+      <obj_property name="ObjectShortName">MEM_OP_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/MEM_OP_SIZE_out" type="other">
+      <obj_property name="ElementShortName">MEM_OP_SIZE_out</obj_property>
+      <obj_property name="ObjectShortName">MEM_OP_SIZE_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/OP_SIGN_out" type="other">
+      <obj_property name="ElementShortName">OP_SIGN_out</obj_property>
+      <obj_property name="ObjectShortName">OP_SIGN_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/usage_mem_out" type="logic">
+      <obj_property name="ElementShortName">usage_mem_out</obj_property>
+      <obj_property name="ObjectShortName">usage_mem_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/instructionExecutionEntity/usage_writeback_out" type="logic">
+      <obj_property name="ElementShortName">usage_writeback_out</obj_property>
+      <obj_property name="ObjectShortName">usage_writeback_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_rs1_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_rs1_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_rs1_addr_out[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_rs1_value_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_rs1_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_rs1_value_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_rs2_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_rs2_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_rs2_addr_out[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_rs2_value_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_rs2_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_rs2_value_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_rd_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_rd_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_rd_addr_out[4:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFD700</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_rd_value_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_rd_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_rd_value_out[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#A52A2A</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_mem_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_ieout_mem_addr_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_mem_addr_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_MEM_OP_out" type="other">
+      <obj_property name="ElementShortName">s_tb_ieout_MEM_OP_out</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_MEM_OP_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_MEM_OP_SIZE_out" type="other">
+      <obj_property name="ElementShortName">s_tb_ieout_MEM_OP_SIZE_out</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_MEM_OP_SIZE_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_OP_SIGN_out" type="other">
+      <obj_property name="ElementShortName">s_tb_ieout_OP_SIGN_out</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_OP_SIGN_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_usage_mem_out" type="logic">
+      <obj_property name="ElementShortName">s_tb_ieout_usage_mem_out</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_usage_mem_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_ieout_usage_writeback_out" type="logic">
+      <obj_property name="ElementShortName">s_tb_ieout_usage_writeback_out</obj_property>
+      <obj_property name="ObjectShortName">s_tb_ieout_usage_writeback_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_pipe_writeback_enable_out" type="logic">
+      <obj_property name="ElementShortName">s_tb_memout_pipe_writeback_enable_out</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_pipe_writeback_enable_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_pipe_writeback_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_memout_pipe_writeback_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_pipe_writeback_addr_out[4:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFD700</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_pipe_writeback_value_out" type="array">
+      <obj_property name="ElementShortName">s_tb_memout_pipe_writeback_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_pipe_writeback_value_out[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#A52A2A</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_rs1_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_memout_rs1_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_rs1_addr_out[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_rs1_value_out" type="array">
+      <obj_property name="ElementShortName">s_tb_memout_rs1_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_rs1_value_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_rs2_addr_out" type="array">
+      <obj_property name="ElementShortName">s_tb_memout_rs2_addr_out[4:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_rs2_addr_out[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_memout_rs2_value_out" type="array">
+      <obj_property name="ElementShortName">s_tb_memout_rs2_value_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_memout_rs2_value_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/FullISAJumps_tb/s_tb_regs_dump" type="array">
+      <obj_property name="ElementShortName">s_tb_regs_dump[0:31][31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_tb_regs_dump[0:31][31:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+</wave_config>

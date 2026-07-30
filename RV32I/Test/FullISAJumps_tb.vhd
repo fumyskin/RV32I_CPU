@@ -26,6 +26,8 @@ architecture behaviour of FullISAJumps_tb is
     signal s_tb_next_pc_2: std_logic_vector(31 downto 0) := (others => '0');
     signal s_tb_next_pc_3: std_logic_vector(31 downto 0) := (others => '0');
 
+
+
     signal s_tb_rs1_addr: std_logic_vector(4 downto 0) := (others => '0');
     signal s_tb_rs1_value: std_logic_vector(31 downto 0);
     signal s_tb_rs2_addr: std_logic_vector(4 downto 0) := (others => '0');
@@ -91,7 +93,6 @@ begin
     port map(
         clock => clock,
         reset => reset,
-        
         curr_instruction => s_tb_curr_instruction,
         next_pc => s_tb_next_pc_1,
         branch_prediction => s_tb_branch_prediction,
@@ -122,7 +123,6 @@ begin
     port map(
         clock => clock,
         reset => reset,
-        
         next_pc => s_tb_next_pc_2,
         rs1_addr => s_tb_rs1_addr,
         rs1_value => s_tb_rs1_value,
@@ -149,9 +149,9 @@ begin
         MEM_OP_SIZE_out => s_tb_ieout_MEM_OP_SIZE_out,
         OP_SIGN_out => s_tb_ieout_OP_SIGN_out,
         usage_mem_out => s_tb_ieout_usage_mem_out,
-        usage_writeback_out => s_tb_ieout_usage_writeback_out,
+        usage_writeback_out => s_tb_ieout_usage_writeback_out
     );
-
+    
     memoryAccessEntity: entity work.MemoryAccess
     port map(
         clock => clock,
@@ -184,40 +184,55 @@ begin
         wait until rising_edge(clock);
         wait until rising_edge(clock);
         reset <= '0';
+        -- RV32I_OPERATION <= "addi x1, x0, 5        ";
         
-        -- RV32I_OPERATION <= "addi x1, x0, 7        ";
+        -- RV32I_OPERATION <= "addi x2, x0, 5        ";
         
-        -- RV32I_OPERATION <= "addi x2, x0, 8        ";
+        -- RV32I_OPERATION <= "addi x3, x0, 3        ";
         
-        -- RV32I_OPERATION <= "addi x3, x0, 9        ";
+        -- RV32I_OPERATION <= "nop                 ";                -- "padding" instructions for data hazard prevention
         
-        -- RV32I_OPERATION <= "addi x4, x0, 10       ";
+        -- RV32I_OPERATION <= "nop                 ";                -- "padding" instructions for data hazard prevention
         
-        -- RV32I_OPERATION <= "addi x5, x0, 11       ";
+        -- RV32I_OPERATION <= "beq  x1, x2, 8      ";                -- Branch taken (5 == 5)
         
-        -- RV32I_OPERATION <= "slt x9, x1, x2        ";
+        -- RV32I_OPERATION <= "addi x4, x0, 1        ";                -- SKIPPED by branch taken
         
-        -- RV32I_OPERATION <= "sw x3, 64(x0)         ";                -- Write x3 value (9 dec) to byte address 040hex (64dec) in 3 clock cycles
+        -- RV32I_OPERATION <= "addi x4, x0, 2        ";
         
-        -- RV32I_OPERATION <= "addi x6, x0, 12       ";                -- "padding" instructions as there's no control of pipe hazards (yet)
+        -- RV32I_OPERATION <= "beq  x1, x3, 8      ";                -- Branch NOT taken (5 != 3, falls through)
         
-        -- RV32I_OPERATION <= "slt x7, x1, x2        ";
+        -- RV32I_OPERATION <= "addi x5, x0, 3        ";
         
-        -- RV32I_OPERATION <= "addi x6, x0, 12       ";
+        -- RV32I_OPERATION <= "addi x5, x0, 4        ";
         
-        -- RV32I_OPERATION <= "lw x1, 64(x0)         ";                -- the value 09 is expected in the register x1 after 4 clock cycles 
+        -- RV32I_OPERATION <= "jal  x0, 12         ";                -- Unconditional jump forward
+        
+        -- RV32I_OPERATION <= "addi x6, x0, 6        ";                -- SKIPPED by JAL
+        
+        -- RV32I_OPERATION <= "addi x6, x0, 7        ";                -- SKIPPED by JAL
+        
+        -- RV32I_OPERATION <= "addi x6, x0, 8        ";
+        
+        -- RV32I_OPERATION <= "addi x7, x0, 76       ";
+        
+        -- RV32I_OPERATION <= "nop                 ";                -- "padding" instructions for data hazard prevention
+        
+        -- RV32I_OPERATION <= "jalr x0, 0(x7)      ";                -- Jump to absolute address in x7 (index 18)
+        
+        -- RV32I_OPERATION <= "addi x8, x0, 9        ";
         
         -- expected register values: ([o] -> to fix, [x] -> correct)
         -- [x]  x0 -> 0
-        -- [x]  x1 -> 7 |>  9
-        -- [x]  x2 -> 8
-        -- [x]  x3 -> 9
-        -- [x]  x4 -> a
-        -- [x]  x5 -> b
-        -- [x]  x6 -> c |> c
-        -- [x]  x7 -> 1
-        -- [x]  x8 -> 0
-        -- [x]  x9 -> 1
+        -- [x]  x1 -> 5
+        -- [x]  x2 -> 5
+        -- [x]  x3 -> 3
+        -- [x]  x4 -> 2
+        -- [x]  x5 -> 4
+        -- [x]  x6 -> 8
+        -- [x]  x7 -> 76
+        -- [x]  x8 -> 9
+        -- [x]  x9 -> 0
         wait;
     end process;
 

@@ -144,12 +144,12 @@ begin
                 when OP_LUI => 
                     v_alu_result := std_logic_vector((v_rs2_unsigned_value sll 12));
                 when OP_AUIPC => 
-                    v_alu_result := AdderFunction(UNSIGNED_UNSIGNED, next_pc, std_logic_vector(rs2_value sll 12));
+                    v_alu_result := AdderFunction(UNSIGNED_UNSIGNED, std_logic_vector(unsigned(next_pc) - 4), std_logic_vector(v_rs2_unsigned_value sll 12));
                 when OP_MEM =>
                     v_alu_result := AdderFunction(UNSIGNED_SIGNED, std_logic_vector(v_rs1_unsigned_value), std_logic_vector(v_immediate_signed));
                     mem_addr_out <= v_alu_result;
                 when OP_JAL | OP_JALR =>
-                    -- store the next_pc in rd
+                    -- store the next_pc in rd (op_jal has usage_writeback:='0' to prevent corruption)
                     v_alu_result := next_pc;
                 when OP_BR =>
                     null;

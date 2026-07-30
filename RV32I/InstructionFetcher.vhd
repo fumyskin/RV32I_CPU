@@ -20,27 +20,45 @@ end entity InstructionFetcher;
 
 architecture behaviour of InstructionFetcher is
     type bram_t is array (0 to 2047) of std_logic_vector(31 downto 0);
-    signal bram : bram_t := (                                       -- define some random words to be able to test the entities
-        0 => x"00700093",                                           -- x1 = 7
-        1 => x"00800113",                                           -- x2 = 8
-        2 => x"00900193",                                           -- x3 = 9
-        3 => x"00A00213",                                           -- x4 = A
-        4 => x"00B00293",                                           -- x5 = B
-        5 => x"0020a4b3",                                           -- x9 = (x1<x2)?1:0
-        6 => x"04302023",                                           -- mem[0x40] = x3
-        7 => x"00C00313",                                           -- x6 = C
-        8 => x"0020A3B3",                                           -- x7 = (x1<x2)?1:0
-        9 => x"00C00313",                                           -- x6 = C
-        10 => x"04002083",                                          -- x1 = mem[0x40]
-        11 => x"0080056F",                                          -- (x10 = PC) & (PC = PC+12)    [instruction address: 0x2c]
-        12 => x"FFFFFFFF",
-        13 => x"FFFFFFFF",
-        14 => x"00C00093",                                          -- x1 = C                       [instruction address: 0x38]
-        15 => x"00B00113",                                          -- x2 = B
-        16 => x"00A00193",                                          -- x3 = A
-        17 => x"00900213",                                          -- x4 = 9
-        18 => x"00800293",                                          -- x5 = 8
-        others => (others => '0')                                   -- keep the other cells to 0
+    signal bram : bram_t := (
+        -- =========================================================================
+        -- 1. INITIALIZATION & DATA HAZARD PADDING
+        -- =========================================================================
+        0  => x"00500093", -- addi x1, x0, 5   (x1 = 5)
+        1  => x"00500113", -- addi x2, x0, 5   (x2 = 5)
+        2  => x"00300193", -- addi x3, x0, 3   (x3 = 3)
+        3  => x"00000000", -- nop              (Hazard padding for register writeback)
+        4  => x"00000000", -- nop              (Hazard padding for register writeback)
+
+        -- =========================================================================
+        -- 2. CONDITIONAL BRANCH TESTS (BR / BEQ)
+        -- =========================================================================
+        5  => x"00208463", -- beq  x1, x2, 8   (Branch taken: 5 == 5)
+        6  => x"00100213", -- addi x4, x0, 1   (SKIPPED)
+        7  => x"00200213", -- addi x4, x0, 2   (x4 = 2)
+
+        8  => x"01308463", -- beq  x1, x3, 8   (Branch NOT taken: 5 != 3, falls through)
+        9  => x"00300293", -- addi x5, x0, 3   (Intermediate step)
+        10 => x"00400293", -- addi x5, x0, 4   (x5 = 4)
+
+        -- =========================================================================
+        -- 3. UNCONDITIONAL JUMP TEST (JAL)
+        -- =========================================================================
+        11 => x"00C0006F", -- jal  x0, 12      (Unconditional jump forward)
+        12 => x"00600313", -- addi x6, x0, 6   (SKIPPED)
+        13 => x"00700313", -- addi x6, x0, 7   (SKIPPED)
+        14 => x"00800313", -- addi x6, x0, 8   (x6 = 8)
+
+        -- =========================================================================
+        -- 4. REGISTER JUMP TEST (JALR)
+        -- =========================================================================
+        15 => x"04c00393", -- addi x7, x0, 76  (x7 = 76 -> targets byte address 76 / index 19)
+        16 => x"00000000", -- nop              (Hazard padding for x7 writeback)
+        17 => x"00038067", -- jalr x0, 0(x7)   (JALR with rd=x0; jumps to address 76)
+        18 => x"00000000", -- nop              (JALR delay slot / masked instruction)
+        19 => x"00900413", -- addi x8, x0, 9   (Jump destination: x8 = 9)
+
+        others => (others => '0')
     );
     signal s_mem_addr: std_logic_vector(10 downto 0) := (others => '0');
     signal s_curr_instruction: std_logic_vector(31 downto 0) := (others => '0');
@@ -138,7 +156,7 @@ begin
                     when "1100011" => -- BR
                         v_branch_pending:= "11";
                         v_branch_prediction_taken := v_curr_instruction(31);  -- negative offset -> branch prediction = taken
-                        if v_branch_prediction_taken then                      
+                        if v_branch_prediction_taken = '1' then                      
                             v_immediate_13bits := v_curr_instruction(31) & -- imm[12]
                                 v_curr_instruction(7) &                 -- imm[11]
                                 v_curr_instruction(30 downto 25) &      -- imm[10:5]
